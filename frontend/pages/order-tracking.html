@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Tracking - FoodZap</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    .tracking-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: var(--lg) var(--md);
+    }
+    
+    .tracking-header {
+      text-align: center;
+      margin-bottom: var(--xl);
+    }
+    
+    .order-id {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: var(--sm);
+    }
+    
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sm);
+      padding: var(--sm) var(--md);
+      border-radius: var(--radius-full);
+      font-weight: 500;
+    }
+    
+    .progress-timeline {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      margin: var(--xl) 0;
+    }
+    
+    .progress-timeline::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--light-gray);
+      z-index: 0;
+    }
+    
+    .progress-bar {
+      position: absolute;
+      top: 20px;
+      left: 0;
+      height: 4px;
+      background: var(--success);
+      z-index: 1;
+      transition: width 0.5s ease;
+    }
+    
+    .timeline-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--sm);
+      position: relative;
+      z-index: 2;
+      background: white;
+      padding: 0 var(--sm);
+    }
+    
+    .step-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-full);
+      background: var(--light-gray);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      color: var(--gray);
+      border: 3px solid white;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .timeline-step.completed .step-icon {
+      background: var(--success);
+      color: white;
+    }
+    
+    .timeline-step.active .step-icon {
+      background: var(--primary);
+      color: white;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+    
+    .step-label {
+      font-size: 0.8rem;
+      color: var(--dark-gray);
+      text-align: center;
+      max-width: 80px;
+    }
+    
+    .timeline-step.completed .step-label,
+    .timeline-step.active .step-label {
+      color: var(--black);
+      font-weight: 500;
+    }
+    
+    .delivery-map {
+      height: 300px;
+      background: var(--lighter-gray);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: var(--lg) 0;
+    }
+    
+    .delivery-info {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: var(--lg);
+      margin-bottom: var(--md);
+    }
+    
+    .delivery-partner {
+      display: flex;
+      align-items: center;
+      gap: var(--md);
+      padding: var(--md);
+      background: var(--lighter-gray);
+      border-radius: var(--radius-md);
+      margin-top: var(--md);
+    }
+    
+    .partner-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: var(--radius-full);
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.25rem;
+    }
+    
+    .order-details {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: var(--lg);
+    }
+    
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: var(--sm) 0;
+      border-bottom: 1px solid var(--light-gray);
+    }
+    
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: var(--md);
+      margin-top: var(--lg);
+    }
+    
+    .action-btn {
+      flex: 1;
+      padding: var(--md);
+      border-radius: var(--radius-md);
+      font-weight: 500;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .action-btn.primary {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .action-btn.secondary {
+      background: var(--lighter-gray);
+      color: var(--dark-gray);
+    }
+    
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--xs);
+      padding: var(--xs) var(--sm);
+      background: rgba(0, 184, 148, 0.1);
+      color: var(--success);
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .live-badge::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: var(--success);
+      border-radius: 50%;
+      animation: blink 1.5s infinite;
+    }
+    
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container header-content">
+      <a href="./index.html" class="logo">
+        <span class="logo-icon">🍕</span>
+        <span>FoodZap</span>
+      </a>
+      <div></div>
+      <div></div>
+    </div>
+  </header>
+
+  <main class="tracking-container">
+    <div class="tracking-header">
+      <div class="order-id" id="orderId">Order #----</div>
+      <div class="live-badge" id="liveBadge">
+        <i class="fas fa-broadcast-tower"></i> Live Tracking
+      </div>
+      <div style="margin-top: var(--md);">
+        <span class="status-badge" id="statusBadge" style="background: var(--warning);">
+          <i class="fas fa-clock"></i> <span id="statusText">Pending</span>
+        </span>
+      </div>
+      <p style="color: var(--dark-gray); margin-top: var(--sm);" id="estimatedTime">
+        Estimated delivery by --:--
+      </p>
+    </div>
+
+    <!-- Progress Timeline -->
+    <div class="card" style="padding: var(--xl);">
+      <div class="progress-timeline" id="progressTimeline">
+        <div class="progress-bar" id="progressBar" style="width: 0%;"></div>
+        
+        <div class="timeline-step" data-step="confirmed">
+          <div class="step-icon"><i class="fas fa-check"></i></div>
+          <div class="step-label">Order Confirmed</div>
+        </div>
+        <div class="timeline-step" data-step="preparing">
+          <div class="step-icon"><i class="fas fa-fire"></i></div>
+          <div class="step-label">Preparing</div>
+        </div>
+        <div class="timeline-step" data-step="ready">
+          <div class="step-icon"><i class="fas fa-box"></i></div>
+          <div class="step-label">Ready</div>
+        </div>
+        <div class="timeline-step" data-step="out_for_delivery">
+          <div class="step-icon"><i class="fas fa-motorcycle"></i></div>
+          <div class="step-label">Out for Delivery</div>
+        </div>
+        <div class="timeline-step" data-step="delivered">
+          <div class="step-icon"><i class="fas fa-home"></i></div>
+          <div class="step-label">Delivered</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delivery Map -->
+    <div class="delivery-info">
+      <h3 style="margin-bottom: var(--md);">Delivery Location</h3>
+      <div class="delivery-map" id="deliveryMap" style="height: 300px; border-radius: var(--radius-lg);"></div>
+      
+      <!-- Delivery Partner Info -->
+      <div class="delivery-partner" id="partnerInfo" style="display: none;">
+        <div class="partner-avatar">
+          <i class="fas fa-user"></i>
+        </div>
+        <div style="flex: 1;">
+          <div style="font-weight: 600;" id="partnerName">--</div>
+          <div style="font-size: 0.9rem; color: var(--dark-gray);">Your delivery partner</div>
+        </div>
+        <a href="#" class="btn btn-ghost" id="callPartner">
+          <i class="fas fa-phone"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Order Details -->
+    <div class="order-details">
+      <h3 style="margin-bottom: var(--md);">Order Details</h3>
+      
+      <div class="detail-row">
+        <span>Restaurant</span>
+        <strong id="restaurantName">--</strong>
+      </div>
+      <div class="detail-row">
+        <span>Items</span>
+        <span id="itemCount">-- items</span>
+      </div>
+      <div class="detail-row">
+        <span>Total Amount</span>
+        <strong id="totalAmount">₹0</strong>
+      </div>
+      <div class="detail-row">
+        <span>Delivery Address</span>
+        <span id="deliveryAddress" style="text-align: right; max-width: 200px;">--</span>
+      </div>
+      <div class="detail-row">
+        <span>Payment Method</span>
+        <span id="paymentMethod">--</span>
+      </div>
+      <div class="detail-row">
+        <span>Order Date</span>
+        <span id="orderDate">--</span>
+      </div>
+      
+      <div id="orderItems" style="margin-top: var(--md);">
+        <!-- Order items loaded dynamically -->
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons" id="actionButtons">
+      <button class="action-btn secondary" id="supportBtn">
+        <i class="fas fa-headset"></i> Support
+      </button>
+      <button class="action-btn secondary" id="cancelBtn" style="display: none;">
+        <i class="fas fa-times"></i> Cancel Order
+      </button>
+    </div>
+  </main>
+
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/utils.js"></script>
+  <script>
+    const TrackingPage = {
+      orderId: null,
+      socket: null,
+      order: null,
+      
+      init() {
+        const params = Utils.getQueryParams();
+        this.orderId = params.orderId || params.id;
+        
+        if (!this.orderId) {
+          Utils.showToast('No order ID provided', 'error');
+          setTimeout(() => window.location.href = 'index.html', 1500);
+          return;
+        }
+        
+        document.getElementById('orderId').textContent = `Order #${this.orderId}`;
+        
+        this.loadOrderDetails();
+        this.initWebSocket();
+        this.initMap();
+        
+        // Refresh every 30 seconds as fallback
+        setInterval(() => this.loadOrderDetails(), 30000);
+      },
+      
+      initMap() {
+        // Default coordinates (Delhi)
+        const defaultLat = 28.6139;
+        const defaultLng = 77.2090;
+        
+        // Initialize map
+        this.map = L.map('deliveryMap').setView([defaultLat, defaultLng], 13);
+        
+        // Add OpenStreetMap tiles (FREE)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(this.map);
+        
+        // Add restaurant marker (red)
+        this.restaurantMarker = L.marker([defaultLat + 0.01, defaultLng + 0.01], {
+          icon: L.divIcon({
+            html: '<div style="background:#e74c3c;color:white;padding:8px 12px;border-radius:20px;font-weight:bold;font-size:12px;">🍽️ Restaurant</div>',
+            className: 'custom-marker',
+            iconSize: [80, 30]
+          })
+        }).addTo(this.map);
+        
+        // Add delivery partner marker (blue, animated)
+        this.deliveryMarker = L.marker([defaultLat, defaultLng], {
+          icon: L.divIcon({
+            html: '<div style="background:#3498db;color:white;padding:8px 12px;border-radius:20px;font-weight:bold;font-size:12px;animation:pulse 2s infinite;">🚗 Rider</div>',
+            className: 'custom-marker',
+            iconSize: [60, 30]
+          })
+        }).addTo(this.map);
+        
+        // Add customer marker (green)
+        this.customerMarker = L.marker([defaultLat - 0.01, defaultLng - 0.01], {
+          icon: L.divIcon({
+            html: '<div style="background:#27ae60;color:white;padding:8px 12px;border-radius:20px;font-weight:bold;font-size:12px;">🏠 You</div>',
+            className: 'custom-marker',
+            iconSize: [50, 30]
+          })
+        }).addTo(this.map);
+        
+        // Draw route line
+        const latlngs = [
+          [defaultLat + 0.01, defaultLng + 0.01],
+          [defaultLat, defaultLng],
+          [defaultLat - 0.01, defaultLng - 0.01]
+        ];
+        this.routeLine = L.polyline(latlngs, {color: '#3498db', weight: 4, dashArray: '10, 10'}).addTo(this.map);
+        
+        // Fit bounds to show all markers
+        this.map.fitBounds([this.restaurantMarker.getLatLng(), this.deliveryMarker.getLatLng(), this.customerMarker.getLatLng()], {
+          padding: [50, 50]
+        });
+      },
+      
+      async loadOrderDetails() {
+        try {
+          const result = await API.orders.track(this.orderId);
+          
+          if (result.success) {
+            this.order = result.data;
+            this.updateUI(result.data);
+          }
+        } catch (error) {
+          Utils.showToast('Failed to load order details', 'error');
+        }
+      },
+      
+      updateUI(data) {
+        // Update status
+        const statusConfig = CONFIG.ORDER_STATUS[data.status] || { label: data.status, color: '#999' };
+        const statusBadge = document.getElementById('statusBadge');
+        const statusText = document.getElementById('statusText');
+        
+        statusBadge.style.background = `${statusConfig.color}20`;
+        statusBadge.style.color = statusConfig.color;
+        statusText.textContent = statusConfig.label;
+        
+        // Update timeline
+        this.updateTimeline(data.status, data.progress);
+        
+        // Update estimated time
+        if (data.estimatedDeliveryTime) {
+          const time = new Date(data.estimatedDeliveryTime);
+          document.getElementById('estimatedTime').textContent = 
+            `Estimated delivery by ${time.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}`;
+        }
+        
+        // Update delivery partner
+        if (data.deliveryPartner) {
+          const partnerInfo = document.getElementById('partnerInfo');
+          partnerInfo.style.display = 'flex';
+          document.getElementById('partnerName').textContent = data.deliveryPartner.name;
+          document.getElementById('callPartner').href = `tel:${data.deliveryPartner.phone}`;
+        }
+        
+        // Update order details
+        document.getElementById('restaurantName').textContent = data.restaurant?.name || '--';
+        document.getElementById('totalAmount').textContent = '--'; // Will be updated with full order data
+        document.getElementById('deliveryAddress').textContent = data.deliveryAddress?.address || '--';
+        
+        // Show/hide cancel button
+        const cancelBtn = document.getElementById('cancelBtn');
+        if (['pending', 'confirmed'].includes(data.status)) {
+          cancelBtn.style.display = 'block';
+        } else {
+          cancelBtn.style.display = 'none';
+        }
+        
+        // Hide live badge if delivered or cancelled
+        if (['delivered', 'cancelled'].includes(data.status)) {
+          document.getElementById('liveBadge').style.display = 'none';
+        }
+      },
+      
+      updateTimeline(status, progress) {
+        const steps = ['confirmed', 'preparing', 'ready', 'out_for_delivery', 'delivered'];
+        const currentIndex = steps.indexOf(status);
+        
+        steps.forEach((step, index) => {
+          const stepEl = document.querySelector(`[data-step="${step}"]`);
+          if (!stepEl) return;
+          
+          stepEl.classList.remove('completed', 'active');
+          
+          if (index < currentIndex) {
+            stepEl.classList.add('completed');
+          } else if (index === currentIndex) {
+            stepEl.classList.add('active');
+          }
+        });
+        
+        // Update progress bar
+        const progressPercent = progress?.percentage || ((currentIndex / (steps.length - 1)) * 100);
+        document.getElementById('progressBar').style.width = `${progressPercent}%`;
+      },
+      
+      initWebSocket() {
+        try {
+          this.socket = io(CONFIG.API_BASE_URL.replace('/api', ''));
+          
+          this.socket.emit('join-order', this.orderId);
+          
+          this.socket.on('status-change', (data) => {
+            if (data.orderId === this.orderId) {
+              this.loadOrderDetails();
+              Utils.showToast(`Order status: ${CONFIG.ORDER_STATUS[data.status]?.label || data.status}`, 'info');
+            }
+          });
+          
+          this.socket.on('location-update', (data) => {
+            console.log('Delivery location updated:', data);
+            if (data.lat && data.lng && this.map && this.deliveryMarker) {
+              this.deliveryMarker.setLatLng([data.lat, data.lng]);
+              this.map.panTo([data.lat, data.lng]);
+            }
+          });
+          
+          this.socket.on('delivery-assigned', (data) => {
+            Utils.showToast(`${data.deliveryPartner.name} is on the way!`, 'success');
+            this.loadOrderDetails();
+          });
+          
+          this.socket.on('order-delivered', (data) => {
+            Utils.showToast('Your order has been delivered!', 'success');
+            this.loadOrderDetails();
+          });
+        } catch (error) {
+          console.error('WebSocket error:', error);
+        }
+      },
+      
+      setupEventListeners() {
+        document.getElementById('supportBtn')?.addEventListener('click', () => {
+          Utils.showToast('Support chat coming soon!', 'info');
+        });
+        
+        document.getElementById('cancelBtn')?.addEventListener('click', () => {
+          Utils.confirm('Are you sure you want to cancel this order?', () => {
+            this.cancelOrder();
+          });
+        });
+      },
+      
+      async cancelOrder() {
+        try {
+          const result = await API.orders.cancel(this.orderId, 'User requested cancellation');
+          if (result.success) {
+            Utils.showToast('Order cancelled successfully', 'success');
+            this.loadOrderDetails();
+          }
+        } catch (error) {
+          Utils.showToast(error.message || 'Failed to cancel order', 'error');
+        }
+      }
+    };
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      TrackingPage.init();
+      TrackingPage.setupEventListeners();
+    });
+  </script>
+</body>
+</html>

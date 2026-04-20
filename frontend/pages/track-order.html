@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Order - FoodZap</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .track-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    
+    .track-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    
+    .track-header h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+    
+    .track-search {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 30px;
+    }
+    
+    .track-input-group {
+      display: flex;
+      gap: 15px;
+    }
+    
+    .track-input {
+      flex: 1;
+      padding: 16px 20px;
+      border: 2px solid var(--light-gray);
+      border-radius: 12px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    
+    .track-input:focus {
+      border-color: var(--primary);
+    }
+    
+    .track-btn {
+      padding: 16px 32px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .track-btn:hover {
+      background: #ee5a6f;
+    }
+    
+    .order-status-card {
+      background: white;
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--light-gray);
+    }
+    
+    .order-info h2 {
+      margin-bottom: 5px;
+    }
+    
+    .order-info p {
+      color: var(--dark-gray);
+    }
+    
+    .order-status {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    
+    .status-confirmed {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+    
+    .status-preparing {
+      background: #fff3e0;
+      color: #f57c00;
+    }
+    
+    .status-out {
+      background: #e8f5e9;
+      color: #388e3c;
+    }
+    
+    .status-delivered {
+      background: #e8f5e9;
+      color: #388e3c;
+    }
+    
+    .timeline {
+      position: relative;
+      padding-left: 40px;
+    }
+    
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 15px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--light-gray);
+    }
+    
+    .timeline-item {
+      position: relative;
+      padding-bottom: 30px;
+    }
+    
+    .timeline-item:last-child {
+      padding-bottom: 0;
+    }
+    
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -33px;
+      top: 0;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--light-gray);
+      border: 3px solid white;
+      box-shadow: 0 0 0 2px var(--light-gray);
+    }
+    
+    .timeline-item.completed::before {
+      background: #00a650;
+      box-shadow: 0 0 0 2px #00a650;
+    }
+    
+    .timeline-item.active::before {
+      background: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary);
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+    
+    .timeline-content h4 {
+      margin-bottom: 5px;
+    }
+    
+    .timeline-content p {
+      color: var(--dark-gray);
+      font-size: 0.9rem;
+    }
+    
+    .timeline-time {
+      color: var(--dark-gray);
+      font-size: 0.8rem;
+      margin-top: 5px;
+    }
+    
+    .delivery-map {
+      background: var(--lighter-gray);
+      border-radius: 12px;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 30px;
+      color: var(--dark-gray);
+    }
+    
+    .recent-orders {
+      margin-top: 40px;
+    }
+    
+    .recent-orders h3 {
+      margin-bottom: 20px;
+    }
+    
+    .order-list-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 15px;
+      background: white;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    
+    .order-list-item img {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+    
+    .order-list-info {
+      flex: 1;
+    }
+    
+    .order-list-info h4 {
+      margin-bottom: 4px;
+    }
+    
+    .order-list-info p {
+      color: var(--dark-gray);
+      font-size: 0.85rem;
+    }
+    
+    .track-again-btn {
+      padding: 8px 16px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container header-content">
+      <a href="./index.html" class="logo">
+        <span class="logo-icon">🍕</span>
+        <span>FoodZap</span>
+      </a>
+      <div></div>
+      <div class="header-actions">
+        <a href="./index.html" class="btn btn-ghost">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="track-container">
+    <div class="track-header">
+      <h1><i class="fas fa-map-marker-alt text-primary"></i> Track Your Order</h1>
+      <p>Enter your order ID to track delivery status in real-time</p>
+    </div>
+
+    <div class="track-search">
+      <div class="track-input-group">
+        <input type="text" class="track-input" placeholder="Enter Order ID (e.g., FZ123456)" id="orderIdInput">
+        <button class="track-btn" onclick="trackOrder()">
+          <i class="fas fa-search"></i> Track Order
+        </button>
+      </div>
+    </div>
+
+    <!-- Order Status Card (Hidden by default) -->
+    <div class="order-status-card" id="orderStatus" style="display: none;">
+      <div class="order-header">
+        <div class="order-info">
+          <h2>Order #FZ123456</h2>
+          <p>Biryani Blues • 2 items • ₹698</p>
+        </div>
+        <span class="order-status status-out">Out for Delivery</span>
+      </div>
+
+      <div class="timeline">
+        <div class="timeline-item completed">
+          <div class="timeline-content">
+            <h4><i class="fas fa-check-circle"></i> Order Confirmed</h4>
+            <p>Your order has been received</p>
+            <div class="timeline-time">12:30 PM</div>
+          </div>
+        </div>
+        <div class="timeline-item completed">
+          <div class="timeline-content">
+            <h4><i class="fas fa-fire"></i> Being Prepared</h4>
+            <p>Restaurant is preparing your food</p>
+            <div class="timeline-time">12:45 PM</div>
+          </div>
+        </div>
+        <div class="timeline-item active">
+          <div class="timeline-content">
+            <h4><i class="fas fa-motorcycle"></i> Out for Delivery</h4>
+            <p>Your order is on the way! Estimated arrival: 1:15 PM</p>
+            <div class="timeline-time">1:00 PM</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-content">
+            <h4><i class="fas fa-home"></i> Delivered</h4>
+            <p>Enjoy your meal!</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="delivery-map">
+        <div style="text-align: center;">
+          <i class="fas fa-map-marked-alt" style="font-size: 3rem; margin-bottom: 10px;"></i>
+          <p>Live tracking map</p>
+          <small>Your delivery partner is 5 mins away</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="recent-orders">
+      <h3>Your Recent Orders</h3>
+      
+      <div class="order-list-item">
+        <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=200&q=80" alt="Pizza Hut">
+        <div class="order-list-info">
+          <h4>Pizza Hut</h4>
+          <p>Order #FZ123455 • Delivered yesterday</p>
+        </div>
+        <button class="track-again-btn" onclick="trackOrder('FZ123455')">Track Again</button>
+      </div>
+      
+      <div class="order-list-item">
+        <img src="https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=200&q=80" alt="Sagar Ratna">
+        <div class="order-list-info">
+          <h4>Sagar Ratna</h4>
+          <p>Order #FZ123450 • Delivered 2 days ago</p>
+        </div>
+        <button class="track-again-btn" onclick="trackOrder('FZ123450')">Track Again</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer" style="background: #1a1a2e; color: white; padding: 40px 0; margin-top: 60px;">
+    <div class="container">
+      <div style="text-align: center;">
+        <h3>FoodZap</h3>
+        <p style="color: #888;">Delivering happiness to your doorstep</p>
+        <div style="margin-top: 20px;">
+          <a href="./index.html" style="color: #ff6b6b; margin: 0 15px;">Home</a>
+          <a href="./restaurants.html" style="color: #888; margin: 0 15px;">Restaurants</a>
+          <a href="./help.html" style="color: #888; margin: 0 15px;">Help</a>
+        </div>
+        <p style="color: #666; margin-top: 30px;">© 2024 FoodZap. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function trackOrder(orderId) {
+      const input = document.getElementById('orderIdInput');
+      if (orderId || input.value) {
+        const statusCard = document.getElementById('orderStatus');
+        statusCard.style.display = 'block';
+        statusCard.scrollIntoView({ behavior: 'smooth' });
+        
+        // In real app, this would fetch from API
+        console.log('Tracking order:', orderId || input.value);
+      } else {
+        alert('Please enter an order ID');
+      }
+    }
+  </script>
+</body>
+</html>

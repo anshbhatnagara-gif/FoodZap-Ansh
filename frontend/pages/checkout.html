@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout - FoodZap</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Razorpay Checkout -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    .checkout-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: var(--lg) var(--md);
+    }
+    
+    .checkout-step {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: var(--lg);
+      margin-bottom: var(--md);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: var(--md);
+      margin-bottom: var(--md);
+      padding-bottom: var(--md);
+      border-bottom: 1px solid var(--light-gray);
+    }
+    
+    .step-number {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-full);
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+    }
+    
+    .step-title {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    
+    .address-card {
+      border: 2px solid var(--light-gray);
+      border-radius: var(--radius-md);
+      padding: var(--md);
+      margin-bottom: var(--sm);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .address-card:hover,
+    .address-card.selected {
+      border-color: var(--primary);
+      background: rgba(255, 107, 107, 0.05);
+    }
+    
+    .address-card.selected {
+      position: relative;
+    }
+    
+    .address-card.selected::after {
+      content: '✓';
+      position: absolute;
+      top: var(--sm);
+      right: var(--sm);
+      width: 24px;
+      height: 24px;
+      background: var(--primary);
+      color: white;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+    }
+    
+    .payment-method {
+      border: 2px solid var(--light-gray);
+      border-radius: var(--radius-md);
+      padding: var(--md);
+      margin-bottom: var(--sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: var(--md);
+      transition: all var(--transition-fast);
+    }
+    
+    .payment-method:hover,
+    .payment-method.selected {
+      border-color: var(--primary);
+      background: rgba(255, 107, 107, 0.05);
+    }
+    
+    .payment-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      background: var(--lighter-gray);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      color: var(--primary);
+    }
+    
+    .order-item {
+      display: flex;
+      gap: var(--md);
+      padding: var(--sm) 0;
+      border-bottom: 1px solid var(--light-gray);
+    }
+    
+    .order-item:last-child {
+      border-bottom: none;
+    }
+    
+    .bill-row {
+      display: flex;
+      justify-content: space-between;
+      padding: var(--xs) 0;
+    }
+    
+    .bill-row.total {
+      font-weight: 600;
+      font-size: 1.1rem;
+      border-top: 2px solid var(--light-gray);
+      margin-top: var(--sm);
+      padding-top: var(--sm);
+    }
+    
+    .place-order-btn {
+      width: 100%;
+      padding: var(--md);
+      font-size: 1.1rem;
+      margin-top: var(--md);
+    }
+    
+    .add-address-btn {
+      border: 2px dashed var(--gray);
+      border-radius: var(--radius-md);
+      padding: var(--md);
+      text-align: center;
+      color: var(--dark-gray);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .add-address-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container header-content">
+      <a href="./index.html" class="logo">
+        <span class="logo-icon">🍕</span>
+        <span>FoodZap</span>
+      </a>
+      <div class="step-title" style="margin: 0;">Secure Checkout</div>
+      <div style="width: 100px;"></div>
+    </div>
+  </header>
+
+  <main class="checkout-container">
+    <div class="grid" style="grid-template-columns: 1fr 350px; gap: var(--lg);">
+      <!-- Left Column - Steps -->
+      <div>
+        <!-- Delivery Address -->
+        <div class="checkout-step" id="addressStep">
+          <div class="step-header">
+            <div class="step-number">1</div>
+            <div class="step-title">Delivery Address</div>
+          </div>
+          <div id="addressesList">
+            <!-- Addresses loaded dynamically -->
+          </div>
+          <div class="add-address-btn" id="addAddressBtn">
+            <i class="fas fa-plus"></i> Add New Address
+          </div>
+        </div>
+        
+        <!-- Payment Method -->
+        <div class="checkout-step" id="paymentStep">
+          <div class="step-header">
+            <div class="step-number">2</div>
+            <div class="step-title">Payment Method</div>
+          </div>
+          <div id="paymentMethods">
+            <div class="payment-method selected" data-method="cod">
+              <div class="payment-icon">
+                <i class="fas fa-money-bill-wave"></i>
+              </div>
+              <div>
+                <div style="font-weight: 600;">Cash on Delivery</div>
+                <div style="font-size: 0.85rem; color: var(--dark-gray);">Pay when you receive</div>
+              </div>
+            </div>
+            <div class="payment-method" data-method="upi">
+              <div class="payment-icon">
+                <i class="fas fa-mobile-alt"></i>
+              </div>
+              <div>
+                <div style="font-weight: 600;">UPI / GPay / PhonePe</div>
+                <div style="font-size: 0.85rem; color: var(--dark-gray);">Fast & secure payment</div>
+              </div>
+            </div>
+            <div class="payment-method" data-method="card">
+              <div class="payment-icon">
+                <i class="fas fa-credit-card"></i>
+              </div>
+              <div>
+                <div style="font-weight: 600;">Credit / Debit Card</div>
+                <div style="font-size: 0.85rem; color: var(--dark-gray);">Visa, Mastercard, RuPay</div>
+              </div>
+            </div>
+            <div class="payment-method" data-method="wallet" id="walletPaymentOption" style="display: none;">
+              <div class="payment-icon" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white;">
+                <i class="fas fa-wallet"></i>
+              </div>
+              <div style="flex: 1;">
+                <div style="font-weight: 600;">FoodZap Wallet</div>
+                <div style="font-size: 0.85rem; color: var(--dark-gray);" id="walletBalance">Balance: Loading...</div>
+              </div>
+              <div id="walletInsufficient" style="display: none; font-size: 0.75rem; color: var(--danger);">
+                Insufficient balance
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right Column - Order Summary -->
+      <div>
+        <div class="checkout-step" style="position: sticky; top: 80px;">
+          <div class="step-header" style="border: none; padding-bottom: 0;">
+            <div class="step-title">Order Summary</div>
+          </div>
+          
+          <div id="orderItems" style="max-height: 300px; overflow-y: auto;">
+            <!-- Items loaded dynamically -->
+          </div>
+          
+          <div style="margin-top: var(--md); padding-top: var(--md); border-top: 1px solid var(--light-gray);">
+            <div class="bill-row">
+              <span>Item Total</span>
+              <span id="billSubtotal">₹0</span>
+            </div>
+            <div class="bill-row">
+              <span>Delivery Fee</span>
+              <span id="billDelivery">₹0</span>
+            </div>
+            <div class="bill-row">
+              <span>Platform Fee</span>
+              <span id="billPlatform">₹5</span>
+            </div>
+            <div class="bill-row">
+              <span>GST</span>
+              <span id="billGST">₹0</span>
+            </div>
+            <div class="bill-row" id="discountRow" style="display: none; color: var(--success);">
+              <span>Discount</span>
+              <span id="billDiscount">-₹0</span>
+            </div>
+            <div class="bill-row total">
+              <span>To Pay</span>
+              <span id="billTotal">₹0</span>
+            </div>
+          </div>
+          
+          <button class="btn btn-primary place-order-btn" id="placeOrderBtn">
+            Place Order
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add Address Modal -->
+  <div class="overlay" id="addressModalOverlay"></div>
+  <div class="modal" id="addressModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: var(--radius-lg); padding: var(--lg); width: 90%; max-width: 500px; z-index: 200;">
+    <h3 style="margin-bottom: var(--md);">Add New Address</h3>
+    <form id="addressForm">
+      <div class="form-group">
+        <label class="form-label">Full Address</label>
+        <textarea class="form-input" id="newAddress" rows="3" required></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Landmark (Optional)</label>
+        <input type="text" class="form-input" id="newLandmark">
+      </div>
+      <div class="grid grid-2" style="gap: var(--md);">
+        <div class="form-group">
+          <label class="form-label">City</label>
+          <input type="text" class="form-input" id="newCity" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Pincode</label>
+          <input type="text" class="form-input" id="newPincode" maxlength="6" required>
+        </div>
+      </div>
+      <div class="flex gap-md" style="margin-top: var(--lg);">
+        <button type="button" class="btn btn-ghost" id="cancelAddress" style="flex: 1;">Cancel</button>
+        <button type="submit" class="btn btn-primary" style="flex: 1;">Save Address</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Razorpay Checkout Script -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/cart.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    const CheckoutPage = {
+      selectedAddress: null,
+      selectedPayment: 'cod',
+      cart: null,
+      
+      init() {
+        if (!App.requireAuth()) return;
+        
+        this.loadCart();
+        this.loadAddresses();
+        this.loadWallet();
+        this.setupEventListeners();
+      },
+      
+      async loadWallet() {
+        try {
+          const result = await API.wallet.getWallet();
+          if (result.success) {
+            const wallet = result.data.wallet;
+            const walletOption = document.getElementById('walletPaymentOption');
+            const walletBalance = document.getElementById('walletBalance');
+            const walletInsufficient = document.getElementById('walletInsufficient');
+            
+            if (wallet && wallet.balance > 0) {
+              walletOption.style.display = 'flex';
+              walletBalance.textContent = `Balance: ${Utils.formatPrice(wallet.balance)}`;
+              
+              // Check if sufficient for current order
+              const total = parseFloat(document.getElementById('billTotal').textContent.replace(/[^0-9.]/g, '')) || 0;
+              if (wallet.balance < total * 100) { // Convert from formatted price
+                walletInsufficient.style.display = 'block';
+                walletOption.style.opacity = '0.6';
+                walletOption.style.pointerEvents = 'none';
+              }
+            }
+          }
+        } catch (error) {
+          console.log('Wallet not available');
+        }
+      },
+      
+      loadCart() {
+        const cart = Utils.getStorage('cart', { items: [], restaurant: null });
+        
+        if (!cart.items || cart.items.length === 0) {
+          Utils.showToast('Your cart is empty', 'warning');
+          setTimeout(() => window.location.href = 'index.html', 1500);
+          return;
+        }
+        
+        this.cart = cart;
+        this.renderOrderSummary();
+      },
+      
+      renderOrderSummary() {
+        const container = document.getElementById('orderItems');
+        let itemsTotal = 0;
+        
+        container.innerHTML = this.cart.items.map(item => {
+          let price = item.price;
+          if (item.variant?.price) price = item.variant.price;
+          
+          let addonsTotal = 0;
+          if (item.addons) {
+            addonsTotal = item.addons.reduce((sum, a) => sum + (a.price || 0), 0);
+          }
+          
+          const itemTotal = (price + addonsTotal) * item.quantity;
+          itemsTotal += itemTotal;
+          
+          return `
+            <div class="order-item">
+              <div style="flex: 1;">
+                <div style="font-weight: 500;">${item.name}</div>
+                ${item.variant ? `<div style="font-size: 0.85rem; color: var(--dark-gray);">${item.variant.name}</div>` : ''}
+                <div style="font-size: 0.9rem; color: var(--dark-gray);">x${item.quantity}</div>
+              </div>
+              <div style="font-weight: 500;">${Utils.formatPrice(itemTotal)}</div>
+            </div>
+          `;
+        }).join('');
+        
+        // Calculate totals
+        const deliveryFee = itemsTotal > 500 ? 0 : 40;
+        const platformFee = 5;
+        const gst = Math.round(itemsTotal * 0.05);
+        const discount = this.cart.coupon?.discount || 0;
+        const total = itemsTotal + deliveryFee + platformFee + gst - discount;
+        
+        document.getElementById('billSubtotal').textContent = Utils.formatPrice(itemsTotal);
+        document.getElementById('billDelivery').textContent = deliveryFee === 0 ? 'FREE' : Utils.formatPrice(deliveryFee);
+        document.getElementById('billGST').textContent = Utils.formatPrice(gst);
+        
+        if (discount > 0) {
+          document.getElementById('discountRow').style.display = 'flex';
+          document.getElementById('billDiscount').textContent = '-' + Utils.formatPrice(discount);
+        }
+        
+        document.getElementById('billTotal').textContent = Utils.formatPrice(Math.max(0, total));
+      },
+      
+      async loadAddresses() {
+        const addresses = Utils.getSavedAddresses();
+        const container = document.getElementById('addressesList');
+        
+        if (addresses.length === 0) {
+          // Try to load from API
+          try {
+            const result = await API.user.getProfile();
+            if (result.success && result.user.addresses?.length > 0) {
+              addresses.push(...result.user.addresses);
+              Utils.setStorage('savedAddresses', addresses);
+            }
+          } catch (error) {
+            console.error('Failed to load addresses', error);
+          }
+        }
+        
+        if (addresses.length === 0) {
+          container.innerHTML = '<p style="color: var(--dark-gray);">No saved addresses. Please add one.</p>';
+          return;
+        }
+        
+        // Select default address
+        const defaultAddr = addresses.find(a => a.isDefault) || addresses[0];
+        this.selectedAddress = defaultAddr;
+        
+        container.innerHTML = addresses.map(addr => `
+          <div class="address-card ${addr.id === defaultAddr.id ? 'selected' : ''}" data-id="${addr.id}">
+            <div style="font-weight: 600; margin-bottom: var(--xs);">
+              ${addr.label || 'Address'}
+              ${addr.isDefault ? '<span class="badge badge-primary" style="margin-left: var(--sm);">Default</span>' : ''}
+            </div>
+            <div style="font-size: 0.9rem; color: var(--dark-gray);">
+              ${addr.address}<br>
+              ${addr.city}, ${addr.state} - ${addr.pincode}
+            </div>
+          </div>
+        `).join('');
+        
+        // Add click handlers
+        container.querySelectorAll('.address-card').forEach(card => {
+          card.addEventListener('click', () => {
+            container.querySelectorAll('.address-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            this.selectedAddress = addresses.find(a => a.id === card.dataset.id);
+          });
+        });
+      },
+      
+      setupEventListeners() {
+        // Payment method selection
+        document.querySelectorAll('.payment-method').forEach(method => {
+          method.addEventListener('click', () => {
+            document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+            method.classList.add('selected');
+            this.selectedPayment = method.dataset.method;
+          });
+        });
+        
+        // Add address button
+        document.getElementById('addAddressBtn')?.addEventListener('click', () => {
+          document.getElementById('addressModal').style.display = 'block';
+          document.getElementById('addressModalOverlay').classList.add('show');
+        });
+        
+        // Cancel address
+        document.getElementById('cancelAddress')?.addEventListener('click', () => {
+          document.getElementById('addressModal').style.display = 'none';
+          document.getElementById('addressModalOverlay').classList.remove('show');
+        });
+        
+        // Address form
+        document.getElementById('addressForm')?.addEventListener('submit', (e) => {
+          e.preventDefault();
+          this.saveNewAddress();
+        });
+        
+        // Place order
+        document.getElementById('placeOrderBtn')?.addEventListener('click', () => {
+          this.placeOrder();
+        });
+      },
+      
+      saveNewAddress() {
+        const address = {
+          id: Utils.generateId('addr_'),
+          address: document.getElementById('newAddress').value,
+          landmark: document.getElementById('newLandmark').value,
+          city: document.getElementById('newCity').value,
+          pincode: document.getElementById('newPincode').value,
+          isDefault: Utils.getSavedAddresses().length === 0
+        };
+        
+        Utils.saveAddress(address);
+        
+        document.getElementById('addressModal').style.display = 'none';
+        document.getElementById('addressModalOverlay').classList.remove('show');
+        
+        this.loadAddresses();
+        Utils.showToast('Address saved!', 'success');
+      },
+      
+      async placeOrder() {
+        if (!this.selectedAddress) {
+          Utils.showToast('Please select a delivery address', 'warning');
+          return;
+        }
+        
+        const btn = document.getElementById('placeOrderBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        
+        try {
+          const orderData = {
+            paymentMethod: this.selectedPayment,
+            deliveryAddress: {
+              address: this.selectedAddress.address,
+              landmark: this.selectedAddress.landmark,
+              city: this.selectedAddress.city,
+              state: this.selectedAddress.state || '',
+              pincode: this.selectedAddress.pincode,
+              coordinates: this.selectedAddress.location?.coordinates || []
+            },
+            items: this.cart.items.map(item => ({
+              menuItemId: item.menuItemId,
+              quantity: item.quantity,
+              variant: item.variant,
+              addons: item.addons,
+              specialInstructions: item.specialInstructions
+            }))
+          };
+          
+          const result = await API.orders.create(orderData);
+          
+          if (result.success) {
+            const orderId = result.data.id;
+            const orderIdDisplay = result.data.orderId;
+            
+            // Handle payment methods
+            if (this.selectedPayment === 'wallet') {
+              // Wallet payment - already processed on backend
+              Cart.clearCart();
+              Utils.showToast('Payment successful! Order placed.', 'success');
+              setTimeout(() => {
+                window.location.href = `order-tracking.html?orderId=${orderIdDisplay}`;
+              }, 1500);
+            } else if (this.selectedPayment === 'cod') {
+              // COD - direct success
+              Cart.clearCart();
+              Utils.showToast('Order placed successfully!', 'success');
+              setTimeout(() => {
+                window.location.href = `order-tracking.html?orderId=${orderIdDisplay}`;
+              }, 1500);
+            } else {
+              // Online payment (UPI, Card, etc.) - Razorpay
+              await this.initiateRazorpayPayment(orderId, orderIdDisplay, result.data.totalAmount);
+            }
+          }
+        } catch (error) {
+          Utils.showToast(error.message || 'Failed to place order', 'error');
+          btn.disabled = false;
+          btn.textContent = 'Place Order';
+        }
+      },
+      
+      async initiateRazorpayPayment(orderId, orderIdDisplay, amount) {
+        try {
+          // Get Razorpay key
+          const keyResult = await API.payment.getKey();
+          if (!keyResult.success) {
+            throw new Error('Failed to initialize payment');
+          }
+          
+          // Create payment order
+          const orderResult = await API.payment.createOrder(orderId);
+          if (!orderResult.success) {
+            throw new Error('Failed to create payment order');
+          }
+          
+          const options = {
+            key: keyResult.key,
+            amount: orderResult.data.amount,
+            currency: orderResult.data.currency,
+            name: 'FoodZap',
+            description: `Order ${orderIdDisplay}`,
+            order_id: orderResult.data.orderId,
+            handler: async (response) => {
+              try {
+                // Verify payment
+                const verifyResult = await API.payment.verify({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                  orderId: orderId
+                });
+                
+                if (verifyResult.success) {
+                  Cart.clearCart();
+                  Utils.showToast('Payment successful! Order placed.', 'success');
+                  setTimeout(() => {
+                    window.location.href = `order-tracking.html?orderId=${orderIdDisplay}`;
+                  }, 1500);
+                }
+              } catch (error) {
+                Utils.showToast('Payment verification failed', 'error');
+                document.getElementById('placeOrderBtn').disabled = false;
+                document.getElementById('placeOrderBtn').textContent = 'Place Order';
+              }
+            },
+            prefill: {
+              name: App.user?.name || '',
+              email: App.user?.email || '',
+              contact: App.user?.phone || ''
+            },
+            theme: {
+              color: '#ff6b6b'
+            },
+            modal: {
+              ondismiss: () => {
+                document.getElementById('placeOrderBtn').disabled = false;
+                document.getElementById('placeOrderBtn').textContent = 'Place Order';
+                Utils.showToast('Payment cancelled', 'warning');
+              }
+            }
+          };
+          
+          const rzp = new Razorpay(options);
+          rzp.open();
+          
+        } catch (error) {
+          Utils.showToast(error.message || 'Payment initialization failed', 'error');
+          document.getElementById('placeOrderBtn').disabled = false;
+          document.getElementById('placeOrderBtn').textContent = 'Place Order';
+        }
+      }
+    };
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      Cart.init();
+      CheckoutPage.init();
+    });
+  </script>
+</body>
+</html>

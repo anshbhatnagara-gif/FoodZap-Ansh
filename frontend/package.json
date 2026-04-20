@@ -1,0 +1,22 @@
+{
+  "name": "foodzap-frontend",
+  "version": "1.0.0",
+  "description": "FoodZap Frontend - Food Delivery & Grocery App",
+  "scripts": {
+    "start": "npx live-server --port=3000 --open=/",
+    "dev": "npx live-server --port=3000 --open=/ --watch",
+    "serve": "npx http-server -p 3000"
+  },
+  "keywords": [
+    "food",
+    "delivery",
+    "grocery",
+    "frontend"
+  ],
+  "author": "FoodZap",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.2",
+    "http-server": "^14.1.1"
+  }
+}

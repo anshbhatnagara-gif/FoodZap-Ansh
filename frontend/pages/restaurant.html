@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Restaurant - FoodZap</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .restaurant-hero {
+      position: relative;
+      height: 300px;
+      overflow: hidden;
+    }
+    
+    .restaurant-hero img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .restaurant-hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6));
+    }
+    
+    .restaurant-hero-content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: var(--xl);
+      color: white;
+      z-index: 1;
+    }
+    
+    .restaurant-info-bar {
+      background: white;
+      box-shadow: var(--shadow-sm);
+      padding: var(--md) 0;
+      position: sticky;
+      top: 64px;
+      z-index: 50;
+    }
+    
+    .menu-tabs {
+      display: flex;
+      gap: var(--md);
+      overflow-x: auto;
+      padding-bottom: var(--sm);
+    }
+    
+    .menu-tab {
+      white-space: nowrap;
+      padding: var(--sm) var(--md);
+      border-radius: var(--radius-full);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .menu-tab:hover {
+      background: var(--lighter-gray);
+    }
+    
+    .menu-tab.active {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .menu-section {
+      margin-bottom: var(--xl);
+    }
+    
+    .menu-section-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: var(--md);
+      padding-bottom: var(--sm);
+      border-bottom: 2px solid var(--light-gray);
+    }
+    
+    .veg-toggle {
+      display: flex;
+      align-items: center;
+      gap: var(--sm);
+      padding: var(--sm) var(--md);
+      background: var(--lighter-gray);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+    }
+    
+    .veg-toggle.active {
+      background: rgba(0, 184, 148, 0.1);
+      color: var(--veg);
+    }
+    
+    .reviews-summary {
+      display: flex;
+      align-items: center;
+      gap: var(--lg);
+      padding: var(--lg);
+      background: var(--lighter-gray);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--lg);
+    }
+    
+    .rating-big {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--success);
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container header-content">
+      <a href="./index.html" class="logo">
+        <span class="logo-icon">🍕</span>
+        <span>FoodZap</span>
+      </a>
+      
+      <div class="search-bar" style="max-width: 300px;">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" class="search-input" placeholder="Search in menu..." id="menuSearch">
+      </div>
+      
+      <div class="header-actions">
+        <button class="btn btn-ghost" id="cartBtn">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="badge badge-primary" id="cartCount" style="display: none;">0</span>
+        </button>
+        
+        <div id="authButtons">
+          <a href="./login.html" class="btn btn-primary btn-sm">Login</a>
+        </div>
+        <div id="userMenu" style="display: none;">
+          <button class="btn btn-ghost" id="userDropdownBtn">
+            <i class="fas fa-user"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Restaurant Hero -->
+  <div class="restaurant-hero" id="restaurantHero">
+    <img src="" alt="Restaurant Cover" id="coverImage">
+    <div class="restaurant-hero-content">
+      <div class="container">
+        <div class="flex gap-sm mb-sm">
+          <span class="badge badge-success" id="vegBadge" style="display: none;">Pure Veg</span>
+          <span class="badge badge-primary" id="ratingBadge">
+            <i class="fas fa-star"></i> <span id="heroRating">4.0</span>
+          </span>
+        </div>
+        <h1 id="restaurantName">Loading...</h1>
+        <p id="restaurantCuisine" style="opacity: 0.9;">--</p>
+        <div class="flex gap-md mt-sm" style="opacity: 0.9;">
+          <span><i class="fas fa-map-marker-alt"></i> <span id="restaurantAddress">--</span></span>
+          <span><i class="fas fa-clock"></i> <span id="deliveryTime">-- min</span></span>
+          <span><i class="fas fa-rupee-sign"></i> <span id="priceForTwo">--</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Bar -->
+  <div class="restaurant-info-bar">
+    <div class="container">
+      <div class="flex justify-between items-center">
+        <div class="menu-tabs" id="menuTabs">
+          <div class="menu-tab active" data-category="all">All</div>
+          <!-- Categories loaded dynamically -->
+        </div>
+        
+        <div class="flex gap-md items-center">
+          <label class="veg-toggle" id="vegToggle">
+            <span style="width: 16px; height: 16px; border: 2px solid var(--veg); border-radius: 2px; display: flex; align-items: center; justify-content: center; color: var(--veg); font-size: 10px;">V</span>
+            <span>Pure Veg</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="container" style="padding: var(--lg) 0;">
+    <div class="grid" style="grid-template-columns: 1fr 350px; gap: var(--xl);">
+      <!-- Menu -->
+      <div id="menuContainer">
+        <!-- Menu sections loaded dynamically -->
+      </div>
+      
+      <!-- Cart Sidebar (Sticky) -->
+      <div id="stickyCart" style="display: none;">
+        <div class="card" style="position: sticky; top: 140px; padding: var(--lg);">
+          <h3 style="margin-bottom: var(--md);">Cart</h3>
+          <div id="miniCartItems" style="max-height: 300px; overflow-y: auto;"></div>
+          <div style="border-top: 1px solid var(--light-gray); margin-top: var(--md); padding-top: var(--md);">
+            <div class="flex justify-between mb-sm">
+              <span>Subtotal</span>
+              <span id="miniCartSubtotal">₹0</span>
+            </div>
+            <a href="./checkout.html" class="btn btn-primary btn-full">
+              Checkout <span id="miniCartTotal">₹0</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reviews Section -->
+    <div class="mt-lg" style="margin-top: var(--xxl);">
+      <h2 style="margin-bottom: var(--lg);">Reviews</h2>
+      
+      <div class="reviews-summary" id="reviewsSummary">
+        <div style="text-align: center;">
+          <div class="rating-big" id="avgRating">4.0</div>
+          <div style="color: var(--dark-gray);">Average Rating</div>
+        </div>
+        <div style="flex: 1;">
+          <div id="ratingBars">
+            <!-- Rating bars loaded dynamically -->
+          </div>
+        </div>
+      </div>
+      
+      <div id="reviewsList">
+        <!-- Reviews loaded dynamically -->
+      </div>
+    </div>
+    
+    <!-- Location Section -->
+    <div class="mt-lg" style="margin-top: var(--xxl);">
+      <h2 style="margin-bottom: var(--lg);">📍 Location</h2>
+      <div id="map" style="height: 400px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md);"></div>
+      <div id="addressDetails" style="margin-top: var(--md); padding: var(--md); background: var(--lighter-gray); border-radius: var(--radius-md);">
+        <!-- Address loaded dynamically -->
+      </div>
+    </div>
+  </main>
+
+  <!-- Cart Sidebar Overlay -->
+  <div class="overlay" id="overlay"></div>
+  <div class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+      <h3><i class="fas fa-shopping-cart"></i> Your Cart</h3>
+      <button class="btn btn-ghost" id="closeCart">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="cart-body" id="cartBody"></div>
+    <div class="cart-footer" id="cartFooter" style="display: none;">
+      <a href="./checkout.html" class="btn btn-primary btn-full btn-lg">Proceed to Checkout</a>
+    </div>
+  </div>
+
+  <!-- Google Maps API -->
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDummyKeyForDevelopment&callback=initMap" onerror="console.log('Google Maps failed to load')"></script>
+  
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/cart.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    // Google Maps callback
+    function initMap() {
+      // Map will be initialized after restaurant data loads
+      if (RestaurantPage.restaurant) {
+        RestaurantPage.initializeMap();
+      }
+    }
+    
+    const RestaurantPage = {
+      restaurantId: null,
+      restaurant: null,
+      menu: {},
+      vegOnly: false,
+      activeCategory: 'all',
+      map: null,
+      marker: null,
+      
+      init() {
+        const params = Utils.getQueryParams();
+        this.restaurantId = params.id;
+        
+        if (!this.restaurantId) {
+          Utils.showToast('Restaurant not found', 'error');
+          window.location.href = 'restaurants.html';
+          return;
+        }
+        
+        this.loadRestaurant();
+        this.loadMenu();
+        this.setupEventListeners();
+      },
+      
+      initializeMap() {
+        if (!this.restaurant || !this.restaurant.address?.location?.coordinates) {
+          console.log('No location data available');
+          return;
+        }
+        
+        const coords = this.restaurant.address.location.coordinates;
+        const lat = coords[1] || 19.0760; // Default: Mumbai
+        const lng = coords[0] || 72.8777;
+        
+        const mapElement = document.getElementById('map');
+        if (!mapElement || typeof google === 'undefined') {
+          console.log('Map element or Google Maps not available');
+          return;
+        }
+        
+        this.map = new google.maps.Map(mapElement, {
+          center: { lat, lng },
+          zoom: 15,
+          mapTypeControl: false,
+          streetViewControl: false
+        });
+        
+        this.marker = new google.maps.Marker({
+          position: { lat, lng },
+          map: this.map,
+          title: this.restaurant.name,
+          animation: google.maps.Animation.DROP
+        });
+        
+        const infoWindow = new google.maps.InfoWindow({
+          content: `<div style="padding: 8px;"><strong>${this.restaurant.name}</strong><br>${this.restaurant.address?.street || ''}</div>`
+        });
+        
+        this.marker.addListener('click', () => {
+          infoWindow.open(this.map, this.marker);
+        });
+      },
+      
+      async loadRestaurant() {
+        try {
+          const location = Utils.getUserLocation();
+          const result = await API.restaurants.getById(
+            this.restaurantId,
+            location.lat,
+            location.lng
+          );
+          
+          if (result.success) {
+            this.restaurant = result.data;
+            this.renderRestaurantInfo(result.data);
+          }
+        } catch (error) {
+          Utils.showToast('Failed to load restaurant', 'error');
+        }
+      },
+      
+      renderRestaurantInfo(data) {
+        document.getElementById('restaurantName').textContent = data.name;
+        document.getElementById('restaurantCuisine').textContent = data.cuisine?.join(', ');
+        document.getElementById('restaurantAddress').textContent = data.address?.area || data.address?.city;
+        document.getElementById('deliveryTime').textContent = 
+          `${data.delivery?.deliveryTime?.min || 30}-${data.delivery?.deliveryTime?.max || 45} min`;
+        document.getElementById('priceForTwo').textContent = `₹${data.priceForTwo || 300} for two`;
+        document.getElementById('heroRating').textContent = data.rating?.average?.toFixed(1) || '4.0';
+        document.getElementById('coverImage').src = data.images?.cover || CONFIG.PLACEHOLDER_IMAGE;
+        
+        if (data.foodType === 'veg') {
+          document.getElementById('vegBadge').style.display = 'inline-flex';
+        }
+        
+        // Update categories tabs
+        const tabsContainer = document.getElementById('menuTabs');
+        data.menuCategories?.forEach(cat => {
+          const tab = document.createElement('div');
+          tab.className = 'menu-tab';
+          tab.dataset.category = cat;
+          tab.textContent = cat;
+          tabsContainer.appendChild(tab);
+        });
+        
+        // Add click handlers for tabs
+        tabsContainer.querySelectorAll('.menu-tab').forEach(tab => {
+          tab.addEventListener('click', () => {
+            tabsContainer.querySelectorAll('.menu-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            this.activeCategory = tab.dataset.category;
+            this.renderMenu();
+          });
+        });
+        
+        // Render address details
+        const addressHtml = `
+          <div style="font-weight: 600; margin-bottom: var(--sm);">${data.name}</div>
+          <div style="color: var(--dark-gray);">
+            ${data.address?.street || ''}<br>
+            ${data.address?.area ? data.address.area + ', ' : ''}${data.address?.city || ''}<br>
+            ${data.address?.state || ''} - ${data.address?.pincode || ''}
+          </div>
+          ${data.phone ? `<div style="margin-top: var(--sm);"><i class="fas fa-phone"></i> ${data.phone}</div>` : ''}
+        `;
+        document.getElementById('addressDetails').innerHTML = addressHtml;
+        
+        // Initialize map if coordinates available
+        if (data.address?.location?.coordinates && typeof google !== 'undefined') {
+          this.initializeMap();
+        }
+      },
+      
+      async loadMenu() {
+        try {
+          const result = await API.restaurants.getMenu(this.restaurantId);
+          if (result.success) {
+            this.menu = result.data;
+            this.renderMenu();
+          }
+        } catch (error) {
+          Utils.showToast('Failed to load menu', 'error');
+        }
+      },
+      
+      renderMenu() {
+        const container = document.getElementById('menuContainer');
+        let html = '';
+        
+        const categories = this.activeCategory === 'all' 
+          ? Object.keys(this.menu)
+          : [this.activeCategory];
+        
+        categories.forEach(category => {
+          const items = this.menu[category];
+          if (!items || items.length === 0) return;
+          
+          // Filter by veg/non-veg if needed
+          const filteredItems = this.vegOnly 
+            ? items.filter(item => item.foodType === 'veg' || item.foodType === 'vegan')
+            : items;
+          
+          if (filteredItems.length === 0) return;
+          
+          html += `
+            <div class="menu-section">
+              <h3 class="menu-section-title">${category}</h3>
+              <div style="display: flex; flex-direction: column; gap: var(--md);">
+          `;
+          
+          filteredItems.forEach(item => {
+            const isVeg = item.foodType === 'veg' || item.foodType === 'vegan';
+            const hasDiscount = item.discountedPrice && item.discountedPrice < item.price;
+            const discountPercent = hasDiscount ? Math.round((1 - item.discountedPrice/item.price) * 100) : 0;
+            const imageUrl = item.images?.[0]?.url || item.image || CONFIG.PLACEHOLDER_IMAGE;
+            
+            html += `
+              <div class="menu-item" style="display: flex; justify-content: space-between; align-items: flex-start; padding: var(--md); border-bottom: 1px solid var(--light-gray);">
+                <div class="menu-item-info" style="flex: 1; padding-right: var(--md);">
+                  <div class="menu-item-name" style="font-weight: 600; font-size: 1.1rem; margin-bottom: var(--xs); display: flex; align-items: center; gap: var(--sm);">
+                    <span class="food-type ${isVeg ? 'veg' : 'non-veg'}" style="font-size: 0.7rem; padding: 2px 5px; border: 1px solid ${isVeg ? '#00b894' : '#e17055'}; color: ${isVeg ? '#00b894' : '#e17055'}; border-radius: 3px; font-weight: 700;">
+                      ${isVeg ? 'VEG' : 'NON-VEG'}
+                    </span>
+                    ${item.name}
+                    ${item.isBestseller ? '<span class="badge" style="background: #fdcb6e; color: #d63031; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">⭐ BESTSELLER</span>' : ''}
+                  </div>
+                  
+                  <!-- Price Display -->
+                  <div class="menu-item-price" style="margin: var(--sm) 0;">
+                    ${hasDiscount ? `
+                      <span style="font-size: 1.2rem; font-weight: 700; color: var(--primary);">₹${item.discountedPrice}</span>
+                      <span style="text-decoration: line-through; color: var(--gray); margin-left: var(--sm); font-size: 0.95rem;">₹${item.price}</span>
+                      <span style="background: #00b894; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; margin-left: var(--sm); font-weight: 600;">${discountPercent}% OFF</span>
+                    ` : `
+                      <span style="font-size: 1.2rem; font-weight: 700; color: var(--primary);">₹${item.price}</span>
+                    `}
+                  </div>
+                  
+                  <!-- Rating -->
+                  ${item.rating?.average ? `
+                    <div style="display: flex; align-items: center; gap: var(--sm); margin: var(--xs) 0;">
+                      <span style="background: #00b894; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">
+                        ★ ${item.rating.average}
+                      </span>
+                      <span style="color: var(--gray); font-size: 0.85rem;">(${item.rating.count} ratings)</span>
+                    </div>
+                  ` : ''}
+                  
+                  <!-- Description -->
+                  ${item.description ? `<div class="menu-item-desc" style="color: var(--gray); font-size: 0.9rem; line-height: 1.5; margin-top: var(--sm);">${item.description}</div>` : ''}
+                  
+                  <!-- Additional Info -->
+                  <div style="display: flex; gap: var(--md); margin-top: var(--sm); font-size: 0.85rem; color: var(--light-gray);">
+                    ${item.calories ? `<span>🔥 ${item.calories} kcal</span>` : ''}
+                    ${item.preparationTime ? `<span>⏱️ ${item.preparationTime} mins</span>` : ''}
+                  </div>
+                </div>
+                
+                <!-- Image Section -->
+                <div class="menu-item-image" style="position: relative; width: 150px; height: 150px; flex-shrink: 0;">
+                  <img src="${imageUrl}" 
+                       alt="${item.name}" 
+                       style="width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius-md); box-shadow: var(--shadow-sm);"
+                       onerror="this.src='${CONFIG.PLACEHOLDER_IMAGE}'">
+                  <button class="add-btn" 
+                          onclick="RestaurantPage.addToCart('${item._id}')"
+                          style="position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); background: white; color: var(--primary); border: 1px solid var(--primary); padding: 8px 24px; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; box-shadow: var(--shadow-md); transition: all 0.2s;"
+                          onmouseover="this.style.background='var(--primary)'; this.style.color='white';"
+                          onmouseout="this.style.background='white'; this.style.color='var(--primary)';">
+                    ADD
+                  </button>
+                </div>
+              </div>
+            `;
+          });
+          
+          html += '</div></div>';
+        });
+        
+        container.innerHTML = html || '<p style="text-align: center; padding: var(--xl);">No items found</p>';
+      },
+      
+      addToCart(itemId) {
+        const item = Object.values(this.menu).flat().find(i => (i._id || i.id) === itemId);
+        if (!item) {
+          console.error('Item not found:', itemId);
+          return;
+        }
+        
+        const result = Cart.quickAdd(item, this.restaurant);
+        if (result) {
+          this.updateMiniCart();
+          Utils.showToast(`${item.name} added to cart!`, 'success');
+        }
+      },
+      
+      updateMiniCart() {
+        const totals = Cart.getTotals();
+        
+        if (totals.itemCount > 0) {
+          document.getElementById('stickyCart').style.display = 'block';
+          
+          // Update mini cart items
+          const itemsHtml = Cart.items.map(item => `
+            <div class="flex justify-between mb-sm" style="font-size: 0.9rem;">
+              <span>${item.name} x${item.quantity}</span>
+              <span>${Utils.formatPrice(item.price * item.quantity)}</span>
+            </div>
+          `).join('');
+          
+          document.getElementById('miniCartItems').innerHTML = itemsHtml;
+          document.getElementById('miniCartSubtotal').textContent = Utils.formatPrice(totals.itemsTotal);
+          document.getElementById('miniCartTotal').textContent = Utils.formatPrice(totals.totalAmount);
+        }
+      },
+      
+      setupEventListeners() {
+        // Veg toggle
+        document.getElementById('vegToggle')?.addEventListener('click', () => {
+          this.vegOnly = !this.vegOnly;
+          document.getElementById('vegToggle').classList.toggle('active', this.vegOnly);
+          this.renderMenu();
+        });
+        
+        // Menu search
+        const searchInput = document.getElementById('menuSearch');
+        searchInput?.addEventListener('input', (e) => {
+          const query = e.target.value.toLowerCase();
+          // Filter menu items
+          // Implementation depends on specific requirements
+        });
+      }
+    };
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      Cart.init();
+      RestaurantPage.init();
+    });
+  </script>
+</body>
+</html>

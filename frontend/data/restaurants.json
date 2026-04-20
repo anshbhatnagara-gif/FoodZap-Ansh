@@ -1,0 +1,412 @@
+{
+  "restaurants": [
+    {
+      "id": "r1",
+      "name": "Biryani Blues",
+      "cuisine": ["Biryani", "North Indian", "Mughlai"],
+      "rating": 4.5,
+      "deliveryTime": "35-45 min",
+      "priceForTwo": 400,
+      "image": "https://images.unsplash.com/photo-1563379091339-03b21bc4a4f8?w=800&q=80",
+      "logo": "https://images.unsplash.com/photo-1563379091339-03b21bc4a4f8?w=200&q=80",
+      "isPureVeg": false,
+      "discount": "20% OFF up to ₹100",
+      "menu": [
+        {
+          "id": "m1",
+          "name": "Hyderabadi Chicken Biryani",
+          "price": 349,
+          "image": "https://images.unsplash.com/photo-1563379091339-03b21bc4a4f8?w=400&q=80",
+          "isVeg": false,
+          "description": "Authentic Hyderabadi style biryani with tender chicken pieces",
+          "rating": 4.6
+        },
+        {
+          "id": "m2",
+          "name": "Veg Dum Biryani",
+          "price": 299,
+          "image": "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=400&q=80",
+          "isVeg": true,
+          "description": "Fragrant basmati rice with mixed vegetables",
+          "rating": 4.4
+        }
+      ]
+    },
+    {
+      "id": "r2",
+      "name": "Pizza Hut",
+      "cuisine": ["Pizza", "Italian", "Fast Food"],
+      "rating": 4.2,
+      "deliveryTime": "30-40 min",
+      "priceForTwo": 600,
+      "image": "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80",
+      "logo": "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=200&q=80",
+      "isPureVeg": false,
+      "discount": "Buy 1 Get 1 Free",
+      "menu": [
+        {
+          "id": "m3",
+          "name": "Margherita Pizza",
+          "price": 299,
+          "image": "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400&q=80",
+          "isVeg": true,
+          "description": "Classic cheese and tomato pizza",
+          "rating": 4.3
+        },
+        {
+          "id": "m4",
+          "name": "Pepperoni Pizza",
+          "price": 449,
+          "image": "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=400&q=80",
+          "isVeg": false,
+          "description": "Loaded with spicy pepperoni slices",
+          "rating": 4.5
+        }
+      ]
+    },
+    {
+      "id": "r3",
+      "name": "Sagar Ratna",
+      "cuisine": ["South Indian", "Pure Veg"],
+      "rating": 4.7,
+      "deliveryTime": "25-35 min",
+      "priceForTwo": 300,
+      "image": "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=800&q=80",
+      "logo": "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=200&q=80",
+      "isPureVeg": true,
+      "discount": "Free Delivery",
+      "menu": [
+        {
+          "id": "m5",
+          "name": "Masala Dosa",
+          "price": 120,
+          "image": "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=400&q=80",
+          "isVeg": true,
+          "description": "Crispy dosa with spiced potato filling",
+          "rating": 4.8
+        },
+        {
+          "id": "m6",
+          "name": "Idli Sambar",
+          "price": 80,
+          "image": "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=400&q=80",
+          "isVeg": true,
+          "description": "Soft steamed idlis with sambar and chutney",
+          "rating": 4.6
+        }
+      ]
+    },
+    {
+      "id": "r4",
+      "name": "Barbeque Nation",
+      "cuisine": ["BBQ", "North Indian", "Buffet"],
+      "rating": 4.4,
+      "deliveryTime": "40-50 min",
+      "priceForTwo": 800,
+      "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=800&q=80",
+      "logo": "https://images.unsplash.com/photo-1544025162-d76694265947?w=200&q=80",
+      "isPureVeg": false,
+      "discount": "Flat 15% OFF",
+      "menu": [
+        {
+          "id": "m7",
+          "name": "Grilled Chicken Wings",
+          "price": 399,
+          "image": "https://images.unsplash.com/photo-1527477396000-64ca9cbecc56?w=400&q=80",
+          "isVeg": false,
+          "description": "Spicy grilled wings with BBQ sauce",
+          "rating": 4.5
+        },
+        {
+          "id": "m8",
+          "name": "Paneer Tikka",
+          "price": 349,
+          "image": "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=400&q=80",
+          "isVeg": true,
+          "description": "Marinated paneer cubes grilled to perfection",
+          "rating": 4.7
+        }
+      ]
+    },
+    {
+      "id": "r5",
+      "name": "Haldiram's",
+      "cuisine": ["North Indian", "Street Food", "Sweets"],
+      "rating": 4.6,
+      "deliveryTime": "20-30 min",
+      "priceForTwo": 350,
+      "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=800&q=80",
+      "logo": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=200&q=80",
+      "isPureVeg": true,
+      "discount": "10% OFF on orders above ₹300",
+      "menu": [
+        {
+          "id": "m9",
+          "name": "Chole Bhature",
+          "price": 180,
+          "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&q=80",
+          "isVeg": true,
+          "description": "Puffy bhaturas with spicy chole masala",
+          "rating": 4.7
+        },
+        {
+          "id": "m10",
+          "name": "Raj Kachori",
+          "price": 150,
+          "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&q=80",
+          "isVeg": true,
+          "description": "Crispy kachori filled with tangy chutneys",
+          "rating": 4.5
+        }
+      ]
+    },
+    {
+      "id": "r6",
+      "name": "KFC",
+      "cuisine": ["Fast Food", "Fried Chicken", "Burgers"],
+      "rating": 4.3,
+      "deliveryTime": "25-35 min",
+      "priceForTwo": 500,
+      "image": "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=800&q=80",
+      "logo": "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=200&q=80",
+      "isPureVeg": false,
+      "discount": "Bucket at ₹499",
+      "menu": [
+        {
+          "id": "m11",
+          "name": "Hot & Crispy Chicken",
+          "price": 249,
+          "image": "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=400&q=80",
+          "isVeg": false,
+          "description": "Signature KFC fried chicken - 2 pieces",
+          "rating": 4.4
+        },
+        {
+          "id": "m12",
+          "name": "Zinger Burger",
+          "price": 199,
+          "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&q=80",
+          "isVeg": false,
+          "description": "Crispy chicken fillet with mayo and lettuce",
+          "rating": 4.3
+        }
+      ]
+    },
+    {
+      "id": "r7",
+      "name": "Chinese Wok",
+      "cuisine": ["Chinese", "Asian", "Noodles"],
+      "rating": 4.1,
+      "deliveryTime": "30-40 min",
+      "priceForTwo": 450,
+      "image": "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=800&q=80",
+      "logo": "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=200&q=80",
+      "isPureVeg": false,
+      "discount": "Free Soup on orders above ₹400",
+      "menu": [
+        {
+          "id": "m13",
+          "name": "Hakka Noodles",
+          "price": 220,
+          "image": "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=400&q=80",
+          "isVeg": true,
+          "description": "Stir-fried noodles with vegetables",
+          "rating": 4.2
+        },
+        {
+          "id": "m14",
+          "name": "Chilli Chicken",
+          "price": 320,
+          "image": "https://images.unsplash.com/photo-1525755662778-989d0524087e?w=400&q=80",
+          "isVeg": false,
+          "description": "Spicy Indo-Chinese chicken starter",
+          "rating": 4.4
+        }
+      ]
+    },
+    {
+      "id": "r8",
+      "name": "Rajdhani Thali",
+      "cuisine": ["Rajasthani", "Gujarati", "Thali"],
+      "rating": 4.8,
+      "deliveryTime": "35-45 min",
+      "priceForTwo": 550,
+      "image": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=800&q=80",
+      "logo": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=200&q=80",
+      "isPureVeg": true,
+      "discount": "Unlimited Thali at ₹399",
+      "menu": [
+        {
+          "id": "m15",
+          "name": "Rajasthani Thali",
+          "price": 399,
+          "image": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&q=80",
+          "isVeg": true,
+          "description": "Dal baati churma, gatte ki sabzi, roti, rice, salad, papad, dessert",
+          "rating": 4.9
+        }
+      ]
+    },
+    {
+      "id": "r9",
+      "name": "Burger King",
+      "cuisine": ["Burgers", "Fast Food", "Beverages"],
+      "rating": 4.2,
+      "deliveryTime": "20-30 min",
+      "priceForTwo": 400,
+      "image": "https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=800&q=80",
+      "logo": "https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=200&q=80",
+      "isPureVeg": false,
+      "discount": "Whopper at ₹129",
+      "menu": [
+        {
+          "id": "m16",
+          "name": "Whopper",
+          "price": 199,
+          "image": "https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=400&q=80",
+          "isVeg": false,
+          "description": "Flame-grilled beef patty with fresh veggies",
+          "rating": 4.3
+        },
+        {
+          "id": "m17",
+          "name": "Veg Whopper",
+          "price": 179,
+          "image": "https://images.unsplash.com/photo-1550547660-d9450f859349?w=400&q=80",
+          "isVeg": true,
+          "description": "Plant-based patty with signature sauce",
+          "rating": 4.1
+        }
+      ]
+    },
+    {
+      "id": "r10",
+      "name": "The Great Kabab Factory",
+      "cuisine": ["Kebabs", "Mughlai", "North Indian"],
+      "rating": 4.6,
+      "deliveryTime": "40-50 min",
+      "priceForTwo": 700,
+      "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=800&q=80",
+      "logo": "https://images.unsplash.com/photo-1544025162-d76694265947?w=200&q=80",
+      "isPureVeg": false,
+      "discount": "15% OFF on Kebab Platters",
+      "menu": [
+        {
+          "id": "m18",
+          "name": "Galouti Kebab",
+          "price": 450,
+          "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=80",
+          "isVeg": false,
+          "description": "Melt-in-mouth lamb kebabs with paratha",
+          "rating": 4.7
+        },
+        {
+          "id": "m19",
+          "name": "Paneer Tikka",
+          "price": 350,
+          "image": "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=400&q=80",
+          "isVeg": true,
+          "description": "Tandoori paneer with mint chutney",
+          "rating": 4.5
+        }
+      ]
+    },
+    {
+      "id": "r11",
+      "name": "Wow! Momo",
+      "cuisine": ["Momos", "Chinese", "Street Food"],
+      "rating": 4.4,
+      "deliveryTime": "25-35 min",
+      "priceForTwo": 300,
+      "image": "https://images.unsplash.com/photo-1625220194771-7eb31f69e244?w=800&q=80",
+      "logo": "https://images.unsplash.com/photo-1625220194771-7eb31f69e244?w=200&q=80",
+      "isPureVeg": false,
+      "discount": "Buy 2 Get 1 Free",
+      "menu": [
+        {
+          "id": "m20",
+          "name": "Chicken Fried Momos",
+          "price": 180,
+          "image": "https://images.unsplash.com/photo-1625220194771-7eb31f69e244?w=400&q=80",
+          "isVeg": false,
+          "description": "Crispy fried momos with spicy schezwan sauce",
+          "rating": 4.5
+        },
+        {
+          "id": "m21",
+          "name": "Veg Steamed Momos",
+          "price": 120,
+          "image": "https://images.unsplash.com/photo-1625220194771-7eb31f69e244?w=400&q=80",
+          "isVeg": true,
+          "description": "Classic vegetable momos with red chutney",
+          "rating": 4.3
+        }
+      ]
+    },
+    {
+      "id": "r12",
+      "name": "Subway",
+      "cuisine": ["Sandwiches", "Healthy", "Fast Food"],
+      "rating": 4.3,
+      "deliveryTime": "20-30 min",
+      "priceForTwo": 400,
+      "image": "https://images.unsplash.com/photo-1553909489-cd47e3b4430a?w=800&q=80",
+      "logo": "https://images.unsplash.com/photo-1553909489-cd47e3b4430a?w=200&q=80",
+      "isPureVeg": false,
+      "discount": "Sub of the Day at ₹199",
+      "menu": [
+        {
+          "id": "m22",
+          "name": "Chicken Teriyaki Sub",
+          "price": 279,
+          "image": "https://images.unsplash.com/photo-1553909489-cd47e3b4430a?w=400&q=80",
+          "isVeg": false,
+          "description": "Grilled chicken with sweet teriyaki sauce",
+          "rating": 4.4
+        },
+        {
+          "id": "m23",
+          "name": "Veggie Delite",
+          "price": 199,
+          "image": "https://images.unsplash.com/photo-1553909489-cd47e3b4430a?w=400&q=80",
+          "isVeg": true,
+          "description": "Fresh vegetables with choice of bread",
+          "rating": 4.2
+        }
+      ]
+    }
+  ],
+  "cuisines": [
+    { "name": "North Indian", "icon": "🍛" },
+    { "name": "South Indian", "icon": "🍘" },
+    { "name": "Chinese", "icon": "🍜" },
+    { "name": "Pizza", "icon": "🍕" },
+    { "name": "Burgers", "icon": "🍔" },
+    { "name": "Biryani", "icon": "🥘" },
+    { "name": "Desserts", "icon": "🍰" },
+    { "name": "Healthy", "icon": "🥗" }
+  ],
+  "offers": [
+    {
+      "id": "o1",
+      "title": "Flat 50% OFF",
+      "description": "On your first order above ₹299",
+      "code": "FIRST50",
+      "bgColor": "#ff6b6b"
+    },
+    {
+      "id": "o2",
+      "title": "Free Delivery",
+      "description": "On orders above ₹199",
+      "code": "FREEDEL",
+      "bgColor": "#4ecdc4"
+    },
+    {
+      "id": "o3",
+      "title": "20% Cashback",
+      "description": "Up to ₹100 on Paytm",
+      "code": "PAYTM20",
+      "bgColor": "#00b4d8"
+    }
+  ]
+}

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offers - FoodZap</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container header-content">
+      <a href="./index.html" class="logo">
+        <span class="logo-icon">🍕</span>
+        <span>FoodZap</span>
+      </a>
+      <nav class="nav-links">
+        <a href="./index.html">Home</a>
+        <a href="./restaurants.html">Restaurants</a>
+        <a href="./instamart.html">Instamart</a>
+        <a href="./offers.html" class="active">Offers</a>
+      </nav>
+      <div class="header-actions">
+        <button class="btn btn-ghost" onclick="toggleCart()">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="cart-badge" id="cartBadge">0</span>
+        </button>
+        <a href="./login.html" class="btn btn-primary">Login</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container" style="padding-top: 100px; min-height: 100vh;">
+    <h1 style="font-size: 2.5rem; font-weight: 700; margin-bottom: var(--lg);">
+      🎉 Best Offers & Deals
+    </h1>
+
+    <!-- Featured Offers -->
+    <div class="offers-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--lg); margin-bottom: var(--xl);">
+      
+      <!-- Offer 1 -->
+      <div class="offer-card" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); border-radius: var(--lg); padding: var(--lg); color: white; box-shadow: var(--shadow-lg);">
+        <div style="font-size: 3rem; margin-bottom: var(--sm);">🍕</div>
+        <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: var(--sm);">50% OFF</h3>
+        <p style="margin-bottom: var(--md);">On your first order above ₹299</p>
+        <div style="background: rgba(255,255,255,0.2); padding: var(--sm); border-radius: var(--sm); font-family: monospace; margin-bottom: var(--md);">
+          Code: FIRST50
+        </div>
+        <button class="btn btn-light" style="width: 100%;" onclick="applyOffer('FIRST50')">
+          Apply Offer
+        </button>
+      </div>
+
+      <!-- Offer 2 -->
+      <div class="offer-card" style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); border-radius: var(--lg); padding: var(--lg); color: white; box-shadow: var(--shadow-lg);">
+        <div style="font-size: 3rem; margin-bottom: var(--sm);">🍔</div>
+        <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: var(--sm);">Buy 1 Get 1</h3>
+        <p style="margin-bottom: var(--md);">On all burgers this weekend</p>
+        <div style="background: rgba(255,255,255,0.2); padding: var(--sm); border-radius: var(--sm); font-family: monospace; margin-bottom: var(--md);">
+          Code: BOGO
+        </div>
+        <button class="btn btn-light" style="width: 100%;" onclick="applyOffer('BOGO')">
+          Apply Offer
+        </button>
+      </div>
+
+      <!-- Offer 3 -->
+      <div class="offer-card" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border-radius: var(--lg); padding: var(--lg); color: white; box-shadow: var(--shadow-lg);">
+        <div style="font-size: 3rem; margin-bottom: var(--sm);">🍰</div>
+        <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: var(--sm);">Free Delivery</h3>
+        <p style="margin-bottom: var(--md);">On orders above ₹199</p>
+        <div style="background: rgba(255,255,255,0.2); padding: var(--sm); border-radius: var(--sm); font-family: monospace; margin-bottom: var(--md);">
+          Code: FREEDEL
+        </div>
+        <button class="btn btn-light" style="width: 100%;" onclick="applyOffer('FREEDEL')">
+          Apply Offer
+        </button>
+      </div>
+
+      <!-- Offer 4 -->
+      <div class="offer-card" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); border-radius: var(--lg); padding: var(--lg); color: white; box-shadow: var(--shadow-lg);">
+        <div style="font-size: 3rem; margin-bottom: var(--sm);">🍱</div>
+        <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: var(--sm);">30% OFF</h3>
+        <p style="margin-bottom: var(--md);">On Chinese cuisine orders</p>
+        <div style="background: rgba(255,255,255,0.2); padding: var(--sm); border-radius: var(--sm); font-family: monospace; margin-bottom: var(--md);">
+          Code: CHINESE30
+        </div>
+        <button class="btn btn-light" style="width: 100%;" onclick="applyOffer('CHINESE30')">
+          Apply Offer
+        </button>
+      </div>
+
+      <!-- Offer 5 -->
+      <div class="offer-card" style="background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); border-radius: var(--lg); padding: var(--lg); color: white; box-shadow: var(--shadow-lg);">
+        <div style="font-size: 3rem; margin-bottom: var(--sm);">🍦</div>
+        <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: var(--sm);">₹100 Cashback</h3>
+        <p style="margin-bottom: var(--md);">On ice cream orders above ₹300</p>
+        <div style="background: rgba(255,255,255,0.2); padding: var(--sm); border-radius: var(--sm); font-family: monospace; margin-bottom: var(--md);">
+          Code: SWEET100
+        </div>
+        <button class="btn btn-light" style="width: 100%;" onclick="applyOffer('SWEET100')">
+          Apply Offer
+        </button>
+      </div>
+
+      <!-- Offer 6 -->
+      <div class="offer-card" style="background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%); border-radius: var(--lg); padding: var(--lg); color: white; box-shadow: var(--shadow-lg);">
+        <div style="font-size: 3rem; margin-bottom: var(--sm);">🥗</div>
+        <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: var(--sm);">40% OFF</h3>
+        <p style="margin-bottom: var(--md);">On healthy food & salads</p>
+        <div style="background: rgba(255,255,255,0.2); padding: var(--sm); border-radius: var(--sm); font-family: monospace; margin-bottom: var(--md);">
+          Code: HEALTHY40
+        </div>
+        <button class="btn btn-light" style="width: 100%;" onclick="applyOffer('HEALTHY40')">
+          Apply Offer
+        </button>
+      </div>
+    </div>
+
+    <!-- Bank Offers -->
+    <h2 style="font-size: 2rem; font-weight: 600; margin-bottom: var(--lg); margin-top: var(--xl);">
+      🏦 Bank & Wallet Offers
+    </h2>
+    <div class="bank-offers" style="background: white; border-radius: var(--lg); padding: var(--lg); box-shadow: var(--shadow-md); margin-bottom: var(--xl);">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--md);">
+        <div class="bank-offer" style="border: 2px dashed var(--border-color); border-radius: var(--md); padding: var(--md); text-align: center;">
+          <div style="font-size: 2rem; margin-bottom: var(--sm);">💳</div>
+          <h4 style="font-weight: 600; margin-bottom: var(--sm);">HDFC Bank</h4>
+          <p style="color: var(--gray); font-size: 0.9rem;">20% off up to ₹150</p>
+          <small style="color: var(--light-gray);">Min order: ₹400</small>
+        </div>
+        <div class="bank-offer" style="border: 2px dashed var(--border-color); border-radius: var(--md); padding: var(--md); text-align: center;">
+          <div style="font-size: 2rem; margin-bottom: var(--sm);">📱</div>
+          <h4 style="font-weight: 600; margin-bottom: var(--sm);">Paytm</h4>
+          <p style="color: var(--gray); font-size: 0.9rem;">Flat ₹75 cashback</p>
+          <small style="color: var(--light-gray);">Code: PAYTM75</small>
+        </div>
+        <div class="bank-offer" style="border: 2px dashed var(--border-color); border-radius: var(--md); padding: var(--md); text-align: center;">
+          <div style="font-size: 2rem; margin-bottom: var(--sm);">🏦</div>
+          <h4 style="font-weight: 600; margin-bottom: var(--sm);">SBI Card</h4>
+          <p style="color: var(--gray); font-size: 0.9rem;">15% off up to ₹200</p>
+          <small style="color: var(--light-gray);">Min order: ₹500</small>
+        </div>
+        <div class="bank-offer" style="border: 2px dashed var(--border-color); border-radius: var(--md); padding: var(--md); text-align: center;">
+          <div style="font-size: 2rem; margin-bottom: var(--sm);">💰</div>
+          <h4 style="font-weight: 600; margin-bottom: var(--sm);">Google Pay</h4>
+          <p style="color: var(--gray); font-size: 0.9rem;">Up to ₹1000 scratch card</p>
+          <small style="color: var(--light-gray);">On orders above ₹299</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Terms -->
+    <div style="background: var(--light-bg); border-radius: var(--md); padding: var(--lg); margin-top: var(--xl);">
+      <h3 style="font-weight: 600; margin-bottom: var(--md);">📋 Terms & Conditions</h3>
+      <ul style="color: var(--gray); font-size: 0.9rem; line-height: 1.8; padding-left: var(--lg);">
+        <li>Offers valid for limited time only</li>
+        <li>Cannot be combined with other offers</li>
+        <li>Minimum order value applies</li>
+        <li>Delivery charges may apply</li>
+        <li>FoodZap reserves the right to modify offers</li>
+      </ul>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer" style="margin-top: var(--xl);">
+    <div class="container">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--lg); margin-bottom: var(--lg);">
+        <div>
+          <h4 style="color: white; margin-bottom: var(--sm);">FoodZap</h4>
+          <p style="color: var(--gray); font-size: 0.9rem;">Food & Grocery Delivery</p>
+        </div>
+        <div>
+          <h4 style="color: white; margin-bottom: var(--sm);">Quick Links</h4>
+          <a href="./restaurants.html" style="display: block; color: var(--gray); margin-bottom: var(--xs);">Restaurants</a>
+          <a href="./instamart.html" style="display: block; color: var(--gray); margin-bottom: var(--xs);">Instamart</a>
+          <a href="./offers.html" style="display: block; color: var(--gray);">Offers</a>
+        </div>
+        <div>
+          <h4 style="color: white; margin-bottom: var(--sm);">Support</h4>
+          <a href="#" style="display: block; color: var(--gray); margin-bottom: var(--xs);">Help Center</a>
+          <a href="#" style="display: block; color: var(--gray); margin-bottom: var(--xs);">Terms</a>
+          <a href="#" style="display: block; color: var(--gray);">Privacy</a>
+        </div>
+      </div>
+      <div style="border-top: 1px solid var(--dark-gray); margin-top: var(--lg); padding-top: var(--md); text-align: center; color: var(--gray); font-size: 0.9rem;">
+        © 2024 FoodZap. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Cart Sidebar -->
+  <div id="cartSidebar" class="cart-sidebar">
+    <div class="cart-header">
+      <h3><i class="fas fa-shopping-cart"></i> Your Cart</h3>
+      <button class="btn btn-ghost" onclick="toggleCart()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div id="cartItems" class="cart-items">
+      <p style="text-align: center; color: var(--gray); padding: var(--xl);">
+        Your cart is empty
+      </p>
+    </div>
+    <div class="cart-footer">
+      <div class="cart-total">
+        <span>Total:</span>
+        <span id="cartTotal">₹0</span>
+      </div>
+      <button class="btn btn-primary" style="width: 100%;" onclick="goToCheckout()">
+        Checkout
+      </button>
+    </div>
+  </div>
+  <div id="cartOverlay" class="cart-overlay" onclick="toggleCart()"></div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/cart.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    // Apply offer function
+    function applyOffer(code) {
+      // Save to localStorage for checkout
+      localStorage.setItem('appliedOffer', JSON.stringify({
+        code: code,
+        appliedAt: new Date().toISOString()
+      }));
+      
+      showToast(`Offer ${code} applied! Redirecting to restaurants...`);
+      
+      setTimeout(() => {
+        window.location.href = './restaurants.html';
+      }, 1500);
+    }
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', () => {
+      Cart.init();
+      updateCartUI();
+      
+      // Hide loader
+      const loader = document.querySelector('.loading-overlay, #loader, .loader');
+      if (loader) loader.style.display = 'none';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+{
+  "name": "FoodZap - Food Delivery",
+  "short_name": "FoodZap",
+  "description": "Order delicious food from your favorite restaurants",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ff6b6b",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3075/3075977.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3075/3075977.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["food", "delivery", "lifestyle"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Order Food",
+      "short_name": "Order",
+      "description": "Order food from restaurants",
+      "url": "/restaurants.html",
+      "icons": [
+        {
+          "src": "https://cdn-icons-png.flaticon.com/512/3075/3075977.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}

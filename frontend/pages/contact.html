@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us - FoodZap</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .contact-container {
+      max-width: 1200px;
+      margin: 100px auto 40px;
+      padding: var(--lg);
+    }
+    
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--xl);
+    }
+    
+    @media (max-width: 768px) {
+      .contact-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .contact-info {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      padding: var(--xl);
+      border-radius: var(--radius-lg);
+    }
+    
+    .contact-info h2 {
+      margin-bottom: var(--md);
+    }
+    
+    .contact-info p {
+      margin-bottom: var(--lg);
+      opacity: 0.9;
+    }
+    
+    .contact-method {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--md);
+      margin-bottom: var(--lg);
+    }
+    
+    .contact-method i {
+      font-size: 1.5rem;
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .contact-method h4 {
+      margin-bottom: var(--xs);
+    }
+    
+    .contact-method p {
+      margin: 0;
+      opacity: 0.9;
+    }
+    
+    .contact-form {
+      background: white;
+      padding: var(--xl);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .contact-form h2 {
+      margin-bottom: var(--md);
+      color: var(--dark);
+    }
+    
+    .form-group {
+      margin-bottom: var(--md);
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: var(--xs);
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+    
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      padding: var(--sm) var(--md);
+      border: 2px solid var(--light-gray);
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+    
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    
+    .form-textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    
+    .social-links {
+      display: flex;
+      gap: var(--sm);
+      margin-top: var(--lg);
+    }
+    
+    .social-links a {
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    
+    .social-links a:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    
+    .map-section {
+      margin-top: var(--xl);
+      background: white;
+      padding: var(--xl);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .map-section h2 {
+      margin-bottom: var(--md);
+    }
+    
+    .map-placeholder {
+      background: var(--lighter-gray);
+      height: 300px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray);
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container header-content">
+      <a href="./index.html" class="logo">
+        <span class="logo-icon">🍕</span>
+        <span>FoodZap</span>
+      </a>
+      <nav class="nav-links">
+        <a href="./index.html">Home</a>
+        <a href="./restaurants.html">Restaurants</a>
+        <a href="./instamart.html">Instamart</a>
+        <a href="./offers.html">Offers</a>
+      </nav>
+      <div class="header-actions">
+        <button class="btn btn-ghost" id="cartBtn">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="badge badge-primary" id="cartCount" style="display: none;">0</span>
+        </button>
+        <div id="authButtons">
+          <a href="./login.html" class="btn btn-ghost btn-sm">Login</a>
+          <a href="./signup.html" class="btn btn-primary btn-sm">Sign Up</a>
+        </div>
+        <div id="userMenu" style="display: none; position: relative;">
+          <button class="btn btn-ghost" id="userDropdownBtn" onclick="toggleUserDropdown()">
+            <i class="fas fa-user"></i>
+          </button>
+          <div id="userDropdown" style="display: none; position: absolute; right: 0; top: 100%; background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); min-width: 180px; z-index: 100; margin-top: var(--sm);">
+            <a href="./profile.html" style="display: block; padding: var(--sm) var(--md); color: var(--dark); text-decoration: none; border-bottom: 1px solid var(--light-gray);">
+              <i class="fas fa-user-circle" style="width: 20px;"></i> My Profile
+            </a>
+            <a href="./orders.html" style="display: block; padding: var(--sm) var(--md); color: var(--dark); text-decoration: none; border-bottom: 1px solid var(--light-gray);">
+              <i class="fas fa-clipboard-list" style="width: 20px;"></i> My Orders
+            </a>
+            <a href="#" onclick="App.logout(); return false;" style="display: block; padding: var(--sm) var(--md); color: var(--danger); text-decoration: none;">
+              <i class="fas fa-sign-out-alt" style="width: 20px;"></i> Logout
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="contact-container">
+    <h1 style="text-align: center; margin-bottom: var(--xl);">
+      <i class="fas fa-headset" style="color: var(--primary);"></i> Contact Us
+    </h1>
+    
+    <div class="contact-grid">
+      <div class="contact-info">
+        <h2>Get in Touch</h2>
+        <p>Have questions or feedback? We'd love to hear from you. Our team is always here to help!</p>
+        
+        <div class="contact-method">
+          <i class="fas fa-phone-alt"></i>
+          <div>
+            <h4>Phone</h4>
+            <p>+91 1800-123-4567<br><small>Toll-free, 24/7</small></p>
+          </div>
+        </div>
+        
+        <div class="contact-method">
+          <i class="fas fa-envelope"></i>
+          <div>
+            <h4>Email</h4>
+            <p>support@foodzap.com<br><small>We reply within 24 hours</small></p>
+          </div>
+        </div>
+        
+        <div class="contact-method">
+          <i class="fas fa-map-marker-alt"></i>
+          <div>
+            <h4>Address</h4>
+            <p>FoodZap Technologies Pvt Ltd<br>123 Tech Park, Mumbai 400001<br>Maharashtra, India</p>
+          </div>
+        </div>
+        
+        <div class="contact-method">
+          <i class="fas fa-comments"></i>
+          <div>
+            <h4>Live Chat</h4>
+            <p><a href="./chat.html" style="color: white; text-decoration: underline;">Chat with us now</a><br><small>Available 24/7</small></p>
+          </div>
+        </div>
+        
+        <div class="social-links">
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+      </div>
+      
+      <div class="contact-form">
+        <h2>Send us a Message</h2>
+        <form id="contactForm">
+          <div class="form-group">
+            <label class="form-label">Your Name</label>
+            <input type="text" class="form-input" id="name" placeholder="Enter your name" required>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" class="form-input" id="email" placeholder="Enter your email" required>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Subject</label>
+            <select class="form-select" id="subject" required>
+              <option value="">Select a subject</option>
+              <option value="order">Order Issue</option>
+              <option value="delivery">Delivery Problem</option>
+              <option value="payment">Payment Issue</option>
+              <option value="feedback">Feedback</option>
+              <option value="business">Business Inquiry</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Message</label>
+            <textarea class="form-textarea" id="message" placeholder="How can we help you?" required></textarea>
+          </div>
+          
+          <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
+            <i class="fas fa-paper-plane"></i> Send Message
+          </button>
+        </form>
+      </div>
+    </div>
+    
+    <div class="map-section">
+      <h2><i class="fas fa-map-marked-alt" style="color: var(--primary);"></i> Find Us</h2>
+      <div class="map-placeholder">
+        <a href="./map.html" class="btn btn-primary btn-lg">
+          <i class="fas fa-map"></i> Open in Maps
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--lg); margin-bottom: var(--lg);">
+        <div>
+          <h4 style="color: white; margin-bottom: var(--sm);">FoodZap</h4>
+          <p style="color: var(--gray); font-size: 0.9rem;">Delicious food delivered to your doorstep.</p>
+        </div>
+        <div>
+          <h4 style="margin-bottom: var(--md);">Quick Links</h4>
+          <ul style="list-style: none; line-height: 2;">
+            <li><a href="./about.html" style="color: var(--gray);">About Us</a></li>
+            <li><a href="./contact.html" style="color: var(--gray);">Contact</a></li>
+            <li><a href="./careers.html" style="color: var(--gray);">Careers</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="margin-bottom: var(--md);">Legal</h4>
+          <ul style="list-style: none; line-height: 2;">
+            <li><a href="./terms.html" style="color: var(--gray);">Terms & Conditions</a></li>
+            <li><a href="./privacy.html" style="color: var(--gray);">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="margin-bottom: var(--md);">Account</h4>
+          <ul style="list-style: none; line-height: 2;">
+            <li><a href="./profile.html" style="color: var(--gray);">My Profile</a></li>
+            <li><a href="./orders.html" style="color: var(--gray);">My Orders</a></li>
+            <li><a href="./chat.html" style="color: var(--gray);">Help Center</a></li>
+          </ul>
+        </div>
+      </div>
+      <div style="text-align: center; padding-top: var(--lg); border-top: 1px solid var(--dark-gray);">
+        <p style="color: var(--gray); font-size: 0.9rem;">&copy; 2024 FoodZap. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Cart Sidebar -->
+  <div class="overlay" id="overlay"></div>
+  <div class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+      <h3><i class="fas fa-shopping-cart"></i> Your Cart</h3>
+      <button class="btn btn-ghost" id="closeCart">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="cart-body" id="cartBody"></div>
+    <div class="cart-footer" id="cartFooter" style="display: none;">
+      <a href="./checkout.html" class="btn btn-primary btn-full btn-lg">Checkout</a>
+    </div>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/cart.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    function toggleUserDropdown() {
+      const dropdown = document.getElementById('userDropdown');
+      if (dropdown) {
+        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+      }
+    }
+    
+    document.getElementById('contactForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const btn = e.target.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+      
+      // Simulate sending
+      setTimeout(() => {
+        Utils.showToast('Message sent successfully! We\'ll get back to you soon.', 'success');
+        e.target.reset();
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message';
+      }, 1500);
+    });
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      Cart.init();
+    });
+  </script>
+</body>
+</html>

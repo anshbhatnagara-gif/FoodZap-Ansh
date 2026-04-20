@@ -1,0 +1,192 @@
+[
+  {
+    "_id": "r1",
+    "name": "Punjabi Dhaba",
+    "cuisine": [
+      "North Indian",
+      "Punjabi"
+    ],
+    "foodType": "veg",
+    "categories": [
+      "North Indian",
+      "Starters",
+      "Main Course",
+      "Breads",
+      "Rice",
+      "Desserts",
+      "Beverages"
+    ],
+    "description": "Authentic Punjabi Dhaba food",
+    "address": {
+      "city": "Mumbai",
+      "location": {
+        "coordinates": [
+          72.8777,
+          19.076
+        ]
+      }
+    },
+    "priceForTwo": 600,
+    "isActive": true,
+    "rating": {
+      "average": 4.5
+    }
+  },
+  {
+    "_id": "r2",
+    "name": "Saravana Bhavan",
+    "cuisine": [
+      "South Indian"
+    ],
+    "foodType": "veg",
+    "categories": [
+      "South Indian",
+      "Breakfast",
+      "Snacks",
+      "Beverages"
+    ],
+    "description": "Famous South Indian restaurant",
+    "address": {
+      "city": "Mumbai",
+      "location": {
+        "coordinates": [
+          72.8777,
+          19.076
+        ]
+      }
+    },
+    "priceForTwo": 400,
+    "isActive": true,
+    "rating": {
+      "average": 4.4
+    }
+  },
+  {
+    "_id": "r3",
+    "name": "Biryani House",
+    "cuisine": [
+      "Biryani",
+      "North Indian"
+    ],
+    "foodType": "non-veg",
+    "categories": [
+      "Biryani",
+      "Kebabs",
+      "Main Course",
+      "Desserts"
+    ],
+    "description": "Best biryani in town",
+    "address": {
+      "city": "Mumbai",
+      "location": {
+        "coordinates": [
+          72.8777,
+          19.076
+        ]
+      }
+    },
+    "priceForTwo": 800,
+    "isActive": true,
+    "rating": {
+      "average": 4.6
+    }
+  },
+  {
+    "_id": "r4",
+    "name": "Burger King Style",
+    "cuisine": [
+      "Fast Food",
+      "American"
+    ],
+    "foodType": "non-veg",
+    "categories": [
+      "Fast Food",
+      "Burgers",
+      "Sides",
+      "Beverages",
+      "Desserts"
+    ],
+    "description": "Fast food burgers and more",
+    "address": {
+      "city": "Mumbai",
+      "location": {
+        "coordinates": [
+          72.8777,
+          19.076
+        ]
+      }
+    },
+    "priceForTwo": 400,
+    "isActive": true,
+    "rating": {
+      "average": 4.2
+    }
+  },
+  {
+    "_id": "r5",
+    "name": "Dragon Wok",
+    "cuisine": [
+      "Chinese",
+      "Thai"
+    ],
+    "foodType": "non-veg",
+    "categories": [
+      "Chinese",
+      "Thai",
+      "Starters",
+      "Noodles",
+      "Rice",
+      "Soups",
+      "Beverages"
+    ],
+    "description": "Asian cuisine specialist",
+    "address": {
+      "city": "Mumbai",
+      "location": {
+        "coordinates": [
+          72.8777,
+          19.076
+        ]
+      }
+    },
+    "priceForTwo": 700,
+    "isActive": true,
+    "rating": {
+      "average": 4.3
+    }
+  },
+  {
+    "_id": "r6",
+    "name": "Instamart Grocery",
+    "cuisine": [
+      "Grocery",
+      "Pantry"
+    ],
+    "foodType": "veg",
+    "categories": [
+      "Grocery",
+      "Rice",
+      "Dal",
+      "Flour",
+      "Spices",
+      "Oil",
+      "Beverages"
+    ],
+    "description": "Online grocery store",
+    "address": {
+      "city": "Mumbai",
+      "location": {
+        "coordinates": [
+          72.8777,
+          19.076
+        ]
+      }
+    },
+    "priceForTwo": 500,
+    "isActive": true,
+    "isGrocery": true,
+    "rating": {
+      "average": 4.5
+    }
+  }
+]

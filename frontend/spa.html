@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FoodZap - Food & Grocery Delivery</title>
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    /* SPA Specific Styles */
+    #app {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    #page-content {
+      flex: 1;
+    }
+    
+    .page-transition {
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Loading spinner */
+    .page-loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 60vh;
+    }
+    
+    /* Navigation active state */
+    .nav-link.active {
+      color: var(--primary);
+      font-weight: 600;
+    }
+    
+    /* Mobile menu for SPA */
+    .mobile-menu-btn {
+      display: none;
+    }
+    
+    @media (max-width: 768px) {
+      .mobile-menu-btn {
+        display: block;
+      }
+      
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        right: 0;
+        background: white;
+        flex-direction: column;
+        padding: var(--md);
+        box-shadow: var(--shadow-lg);
+      }
+      
+      .nav-links.show {
+        display: flex;
+      }
+      
+      .nav-links a {
+        padding: var(--sm) 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Main App Container -->
+  <div id="app">
+    <!-- Content will be dynamically rendered here -->
+    <div class="page-loading">
+      <i class="fas fa-spinner fa-spin fa-3x" style="color: var(--primary);"></i>
+    </div>
+  </div>
+
+  <!-- Scripts - Load in order -->
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/ai.js"></script>
+  
+  <!-- Menu Modules -->
+  <script src="js/menu/north-indian.js"></script>
+  <script src="js/menu/south-indian.js"></script>
+  <script src="js/menu/chinese.js"></script>
+  <script src="js/menu/biryani.js"></script>
+  <script src="js/menu/pizza.js"></script>
+  <script src="js/menu/burger.js"></script>
+  <script src="js/menu/desserts.js"></script>
+  <script src="js/menu/beverages.js"></script>
+  <script src="js/menu/index.js"></script>
+  
+  <script src="js/pages.js"></script>
+  <script src="js/router.js"></script>
+  <script src="js/app.js"></script>
+  
+  <script>
+    // Initialize SPA when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      // Check if running as SPA or need to redirect
+      const path = window.location.pathname;
+      const isSPA = path.includes('spa.html') || path === '/' || path === '/index.html';
+      
+      if (!isSPA && path.endsWith('.html')) {
+        // Redirect from old HTML pages to SPA
+        const pageName = path.replace('/pages/', '').replace('.html', '');
+        const routeMap = {
+          'index': '/',
+          'home': '/',
+          'restaurants': '/restaurants',
+          'restaurant': '/restaurants',
+          'cart': '/cart',
+          'checkout': '/checkout',
+          'login': '/login',
+          'profile': '/profile',
+          'orders': '/orders',
+          'order-tracking': '/order-tracking',
+          'wallet': '/wallet',
+          'offers': '/offers',
+          'instamart': '/instamart',
+          'favorites': '/favorites',
+          'addresses': '/addresses'
+        };
+        
+        const route = routeMap[pageName] || '/';
+        window.location.replace('/spa.html#' + route);
+        return;
+      }
+      
+      // Initialize App
+      if (typeof App !== 'undefined') {
+        App.init();
+      }
+      
+      // Initialize Router
+      if (typeof Router !== 'undefined') {
+        // Check for hash-based route (from redirect)
+        if (window.location.hash) {
+          const hashRoute = window.location.hash.substring(1);
+          window.history.replaceState({}, '', hashRoute);
+        }
+        Router.init();
+      }
+    });
+    
+    // Handle all link clicks for SPA navigation
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('a');
+      if (!link) return;
+      
+      const href = link.getAttribute('href');
+      if (!href || href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto:')) {
+        return; // External link or anchor - let browser handle it
+      }
+      
+      if (href.endsWith('.html')) {
+        // Convert old HTML links to SPA routes
+        e.preventDefault();
+        const pageName = href.replace('./', '').replace('.html', '').replace('pages/', '');
+        const routeMap = {
+          'index': '/',
+          'home': '/',
+          'restaurants': '/restaurants',
+          'restaurant': '/restaurant',
+          'cart': '/cart',
+          'checkout': '/checkout',
+          'login': '/login',
+          'profile': '/profile',
+          'orders': '/orders',
+          'order-tracking': '/order-tracking',
+          'wallet': '/wallet',
+          'offers': '/offers',
+          'instamart': '/instamart'
+        };
+        const route = routeMap[pageName] || '/';
+        Router.navigate(route);
+      } else if (href.startsWith('/')) {
+        // SPA route
+        e.preventDefault();
+        Router.navigate(href);
+      }
+    });
+  </script>
+</body>
+</html>

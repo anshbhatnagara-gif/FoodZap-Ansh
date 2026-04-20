@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instamart - FoodZap</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .instamart-hero {
+      background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+      color: white;
+      padding: var(--xl) 0;
+      margin-bottom: var(--lg);
+    }
+    
+    .category-pills {
+      display: flex;
+      gap: var(--sm);
+      overflow-x: auto;
+      padding: var(--md) 0;
+      margin-bottom: var(--md);
+    }
+    
+    .category-pill {
+      display: flex;
+      align-items: center;
+      gap: var(--sm);
+      padding: var(--sm) var(--md);
+      background: white;
+      border-radius: var(--radius-full);
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .category-pill:hover,
+    .category-pill.active {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .product-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: var(--md);
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow var(--transition-normal);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .product-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+    
+    .product-image {
+      aspect-ratio: 1;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: var(--sm);
+      background: var(--lighter-gray);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .product-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .product-name {
+      font-weight: 500;
+      font-size: 0.95rem;
+      margin-bottom: var(--xs);
+      display: -webkit-box;
+      display: box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .product-weight {
+      font-size: 0.8rem;
+      color: var(--dark-gray);
+      margin-bottom: var(--sm);
+    }
+    
+    .product-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+    }
+    
+    .product-price {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    
+    .add-btn-sm {
+      padding: var(--xs) var(--md);
+      background: white;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      border-radius: var(--radius-sm);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .add-btn-sm:hover {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .offers-banner {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--md);
+      margin-bottom: var(--lg);
+    }
+    
+    .offer-card {
+      border-radius: var(--radius-lg);
+      padding: var(--md);
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container header-content">
+      <a href="./index.html" class="logo">
+        <span class="logo-icon">🍕</span>
+        <span>FoodZap</span>
+      </a>
+      
+      <div class="search-bar" style="max-width: 300px;">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" class="search-input" placeholder="Search groceries..." id="grocerySearch">
+      </div>
+      
+      <div class="header-actions">
+        <button class="btn btn-ghost" id="cartBtn">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="badge badge-primary" id="cartCount" style="display: none;">0</span>
+        </button>
+        
+        <div id="authButtons">
+          <a href="./login.html" class="btn btn-primary btn-sm">Login</a>
+        </div>
+        <div id="userMenu" style="display: none; position: relative;">
+          <button class="btn btn-ghost" id="userDropdownBtn" onclick="toggleUserDropdown()">
+            <i class="fas fa-user"></i>
+          </button>
+          <div id="userDropdown" style="display: none; position: absolute; right: 0; top: 100%; background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); min-width: 180px; z-index: 100; margin-top: var(--sm);">
+            <a href="./profile.html" style="display: block; padding: var(--sm) var(--md); color: var(--dark); text-decoration: none; border-bottom: 1px solid var(--light-gray);">
+              <i class="fas fa-user-circle" style="width: 20px;"></i> My Profile
+            </a>
+            <a href="./orders.html" style="display: block; padding: var(--sm) var(--md); color: var(--dark); text-decoration: none; border-bottom: 1px solid var(--light-gray);">
+              <i class="fas fa-clipboard-list" style="width: 20px;"></i> My Orders
+            </a>
+            <a href="#" onclick="App.logout(); return false;" style="display: block; padding: var(--sm) var(--md); color: var(--danger); text-decoration: none;">
+              <i class="fas fa-sign-out-alt" style="width: 20px;"></i> Logout
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <div class="instamart-hero">
+    <div class="container">
+      <div class="flex justify-between items-center" style="flex-wrap: wrap; gap: var(--md);">
+        <div>
+          <h1 style="font-size: 2rem; margin-bottom: var(--sm);">🛒 Instamart</h1>
+          <p style="font-size: 1.1rem; opacity: 0.9;">Groceries delivered in 15-30 minutes</p>
+        </div>
+        <div class="flex gap-md">
+          <div style="text-align: center;">
+            <div style="font-size: 1.5rem; font-weight: 600;">15-30</div>
+            <div style="font-size: 0.85rem; opacity: 0.9;">min delivery</div>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 1.5rem; font-weight: 600;">5000+</div>
+            <div style="font-size: 0.85rem; opacity: 0.9;">products</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="container" style="padding-bottom: var(--xl);">
+    <!-- Category Pills -->
+    <div class="category-pills" id="categoryPills">
+      <!-- Categories loaded dynamically -->
+    </div>
+
+    <!-- Offers Banner -->
+    <div class="offers-banner" id="offersBanner">
+      <!-- Offers loaded dynamically -->
+    </div>
+
+    <!-- Products Grid -->
+    <div class="flex justify-between items-center mb-md">
+      <h2 id="sectionTitle">Trending Products</h2>
+      <select class="form-select" id="sortSelect" style="width: auto; padding: var(--xs) var(--md);">
+        <option value="popular">Popular</option>
+        <option value="price_low">Price: Low to High</option>
+        <option value="price_high">Price: High to Low</option>
+      </select>
+    </div>
+    
+    <div class="grid grid-auto" id="productsGrid" style="grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));">
+      <!-- Products loaded dynamically -->
+    </div>
+  </main>
+
+  <!-- Cart Sidebar -->
+  <div class="overlay" id="overlay"></div>
+  <div class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+      <h3><i class="fas fa-shopping-cart"></i> Your Cart</h3>
+      <button class="btn btn-ghost" id="closeCart">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="cart-body" id="cartBody"></div>
+    <div class="cart-footer" id="cartFooter" style="display: none;">
+      <a href="./checkout.html" class="btn btn-primary btn-full btn-lg">Checkout</a>
+    </div>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/cart.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    // Hide loader when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      const loader = document.querySelector('.loading-overlay, #loader, .loader');
+      if (loader) loader.style.display = 'none';
+    });
+  </script>
+  <script>
+    const InstamartPage = {
+      currentCategory: '',
+      products: [],
+      
+      init() {
+        this.loadCategories();
+        this.loadOffers();
+        this.loadProducts();
+        this.setupEventListeners();
+      },
+      
+      async loadCategories() {
+        try {
+          const result = await API.grocery.getCategories();
+          if (result.success) {
+            const container = document.getElementById('categoryPills');
+            container.innerHTML = [
+              { id: '', name: 'All', icon: '🛍️' },
+              ...result.data
+            ].map(cat => `
+              <div class="category-pill ${cat.id === '' ? 'active' : ''}" data-category="${cat.id}">
+                <span>${cat.icon}</span>
+                <span>${cat.name}</span>
+              </div>
+            `).join('');
+            
+            // Add click handlers
+            container.querySelectorAll('.category-pill').forEach(pill => {
+              pill.addEventListener('click', () => {
+                container.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+                this.currentCategory = pill.dataset.category;
+                this.loadProducts();
+              });
+            });
+          }
+        } catch (error) {
+          console.error('Failed to load categories', error);
+        }
+      },
+      
+      async loadOffers() {
+        try {
+          const result = await API.grocery.getOffers();
+          if (result.success) {
+            const container = document.getElementById('offersBanner');
+            container.innerHTML = result.data.map(offer => `
+              <div class="offer-card" style="background: ${offer.color};">
+                <h3 style="margin-bottom: var(--xs);">${offer.title}</h3>
+                <p style="font-size: 0.9rem; opacity: 0.9;">${offer.description}</p>
+                ${offer.code ? `<div style="margin-top: var(--sm); padding: var(--xs) var(--sm); background: rgba(255,255,255,0.2); border-radius: var(--radius-sm); display: inline-block; font-size: 0.85rem;">Code: ${offer.code}</div>` : ''}
+              </div>
+            `).join('');
+          }
+        } catch (error) {
+          console.error('Failed to load offers', error);
+        }
+      },
+      
+      async loadProducts() {
+        const container = document.getElementById('productsGrid');
+        Utils.showLoading(container, 'Loading products...');
+        
+        try {
+          const result = await API.grocery.getProducts({
+            category: this.currentCategory,
+            page: 1,
+            limit: 50
+          });
+          
+          if (result.success) {
+            this.products = result.data;
+            this.renderProducts(result.data);
+            document.getElementById('sectionTitle').textContent = 
+              this.currentCategory ? this.currentCategory.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Trending Products';
+          }
+        } catch (error) {
+          Utils.showError(container, 'Failed to load products');
+        }
+      },
+      
+      renderProducts(products) {
+        const container = document.getElementById('productsGrid');
+        
+        if (products.length === 0) {
+          container.innerHTML = '<p style="text-align: center; grid-column: 1/-1; padding: var(--xl);">No products found</p>';
+          return;
+        }
+        
+        container.innerHTML = products.map(product => `
+          <div class="product-card">
+            <div class="product-image">
+              <img src="${product.images?.[0]?.url || 'https://via.placeholder.com/150?text=Product'}" 
+                   alt="${product.name}" loading="lazy">
+            </div>
+            <div class="product-name">${product.name}</div>
+            <div class="product-weight">${product.portionSize || product.stock?.unit || ''}</div>
+            <div class="product-footer">
+              <div class="product-price">${Utils.formatPrice(product.price)}</div>
+              <button class="add-btn-sm" onclick="InstamartPage.addToCart('${product._id}')">
+                ADD
+              </button>
+            </div>
+          </div>
+        `).join('');
+        
+        Utils.lazyLoadImages();
+      },
+      
+      addToCart(productId) {
+        const product = this.products.find(p => p._id === productId);
+        if (!product) return;
+        
+        const item = {
+          menuItemId: product._id,
+          name: product.name,
+          price: product.price,
+          image: product.images?.[0]?.url,
+          quantity: 1,
+          restaurant: {
+            id: 'instamart',
+            name: 'Instamart'
+          }
+        };
+        
+        Cart.addItem(item);
+      },
+      
+      setupEventListeners() {
+        // Search
+        const searchInput = document.getElementById('grocerySearch');
+        searchInput?.addEventListener('input', Utils.debounce((e) => {
+          const query = e.target.value.toLowerCase();
+          const filtered = this.products.filter(p => 
+            p.name.toLowerCase().includes(query)
+          );
+          this.renderProducts(filtered);
+        }, 300));
+        
+        // Sort
+        document.getElementById('sortSelect')?.addEventListener('change', (e) => {
+          const sort = e.target.value;
+          let sorted = [...this.products];
+          
+          switch (sort) {
+            case 'price_low':
+              sorted.sort((a, b) => a.price - b.price);
+              break;
+            case 'price_high':
+              sorted.sort((a, b) => b.price - a.price);
+              break;
+            default:
+              sorted.sort((a, b) => (b.orderCount || 0) - (a.orderCount || 0));
+          }
+          
+          this.renderProducts(sorted);
+        });
+      }
+    };
+    
+    // Toggle user dropdown menu
+    function toggleUserDropdown() {
+      const dropdown = document.getElementById('userDropdown');
+      if (dropdown) {
+        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+      }
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      Cart.init();
+      InstamartPage.init();
+    });
+  </script>
+</body>
+</html>

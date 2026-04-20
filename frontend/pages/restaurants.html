@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Restaurants - FoodZap</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    .filters-sidebar {
+      position: sticky;
+      top: 80px;
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: var(--md);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .filter-section {
+      margin-bottom: var(--lg);
+    }
+    
+    .filter-title {
+      font-weight: 600;
+      margin-bottom: var(--sm);
+      font-size: 0.95rem;
+    }
+    
+    .filter-option {
+      display: flex;
+      align-items: center;
+      gap: var(--sm);
+      padding: var(--xs) 0;
+      cursor: pointer;
+    }
+    
+    .filter-option input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+    }
+    
+    .sort-dropdown {
+      position: relative;
+    }
+    
+    .sort-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: white;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      min-width: 180px;
+      display: none;
+      z-index: 10;
+    }
+    
+    .sort-menu.show {
+      display: block;
+    }
+    
+    .sort-option {
+      padding: var(--sm) var(--md);
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+    
+    .sort-option:hover,
+    .sort-option.active {
+      background: var(--lighter-gray);
+    }
+    
+    .restaurant-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--lg);
+    }
+    
+    #restaurantsMap {
+      height: 400px;
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--lg);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .custom-marker-restaurant {
+      background: #e74c3c;
+      color: white;
+      padding: 6px 10px;
+      border-radius: 15px;
+      font-weight: bold;
+      font-size: 11px;
+      white-space: nowrap;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+    
+    @media (max-width: 768px) {
+      .filters-sidebar {
+        display: none;
+      }
+      
+      .mobile-filters {
+        display: flex;
+        gap: var(--sm);
+        overflow-x: auto;
+        padding-bottom: var(--sm);
+      }
+      
+      .mobile-filter-chip {
+        white-space: nowrap;
+        padding: var(--sm) var(--md);
+        background: white;
+        border-radius: var(--radius-full);
+        border: 1px solid var(--light-gray);
+        font-size: 0.9rem;
+      }
+      
+      .mobile-filter-chip.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container header-content">
+      <a href="./index.html" class="logo">
+        <span class="logo-icon">🍕</span>
+        <span>FoodZap</span>
+      </a>
+      
+      <div class="search-bar" style="max-width: 400px;">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" class="search-input" placeholder="Search restaurants or dishes..." id="searchInput">
+      </div>
+      
+      <div class="header-actions">
+        <button class="btn btn-ghost" id="cartBtn">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="badge badge-primary" id="cartCount" style="display: none;">0</span>
+        </button>
+        
+        <div id="authButtons">
+          <a href="./login.html" class="btn btn-primary btn-sm">Login</a>
+        </div>
+        <div id="userMenu" style="display: none; position: relative;">
+          <button class="btn btn-ghost" id="userDropdownBtn" onclick="toggleUserDropdown()">
+            <i class="fas fa-user"></i>
+          </button>
+          <div id="userDropdown" style="display: none; position: absolute; right: 0; top: 100%; background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); min-width: 180px; z-index: 100; margin-top: var(--sm);">
+            <a href="./profile.html" style="display: block; padding: var(--sm) var(--md); color: var(--dark); text-decoration: none; border-bottom: 1px solid var(--light-gray);">
+              <i class="fas fa-user-circle" style="width: 20px;"></i> My Profile
+            </a>
+            <a href="./orders.html" style="display: block; padding: var(--sm) var(--md); color: var(--dark); text-decoration: none; border-bottom: 1px solid var(--light-gray);">
+              <i class="fas fa-clipboard-list" style="width: 20px;"></i> My Orders
+            </a>
+            <a href="#" onclick="App.logout(); return false;" style="display: block; padding: var(--sm) var(--md); color: var(--danger); text-decoration: none;">
+              <i class="fas fa-sign-out-alt" style="width: 20px;"></i> Logout
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding: var(--lg) 0;">
+    <!-- Mobile Filters -->
+    <div class="mobile-filters mb-md" style="display: none;" id="mobileFilters">
+      <button class="mobile-filter-chip active" data-filter="all">All</button>
+      <button class="mobile-filter-chip" data-filter="veg">Pure Veg</button>
+      <button class="mobile-filter-chip" data-filter="rating4">4+ Rated</button>
+      <button class="mobile-filter-chip" data-filter="fast">Fast Delivery</button>
+      <button class="mobile-filter-chip" data-filter="offers">Offers</button>
+    </div>
+    
+    <div class="grid" style="grid-template-columns: 250px 1fr; gap: var(--lg);">
+      <!-- Filters Sidebar -->
+      <aside class="filters-sidebar">
+        <div class="filter-section">
+          <div class="filter-title">Sort By</div>
+          <div class="sort-dropdown">
+            <button class="btn btn-ghost" id="sortBtn" style="width: 100%; justify-content: space-between;">
+              <span id="sortLabel">Relevance</span>
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="sort-menu" id="sortMenu">
+              <div class="sort-option active" data-sort="relevance">Relevance</div>
+              <div class="sort-option" data-sort="rating">Rating (High to Low)</div>
+              <div class="sort-option" data-sort="delivery_time">Delivery Time</div>
+              <div class="sort-option" data-sort="price_low">Price (Low to High)</div>
+              <div class="sort-option" data-sort="price_high">Price (High to Low)</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="filter-section">
+          <div class="filter-title">Cuisines</div>
+          <div id="cuisineFilters">
+            <!-- Loaded dynamically -->
+          </div>
+        </div>
+        
+        <div class="filter-section">
+          <div class="filter-title">Rating</div>
+          <label class="filter-option">
+            <input type="checkbox" value="4.5" class="rating-filter">
+            <span>4.5+</span>
+          </label>
+          <label class="filter-option">
+            <input type="checkbox" value="4" class="rating-filter">
+            <span>4.0+</span>
+          </label>
+          <label class="filter-option">
+            <input type="checkbox" value="3" class="rating-filter">
+            <span>3.0+</span>
+          </label>
+        </div>
+        
+        <div class="filter-section">
+          <div class="filter-title">Price Range</div>
+          <label class="filter-option">
+            <input type="checkbox" value="0-300" class="price-filter">
+            <span>Less than ₹300</span>
+          </label>
+          <label class="filter-option">
+            <input type="checkbox" value="300-600" class="price-filter">
+            <span>₹300 to ₹600</span>
+          </label>
+          <label class="filter-option">
+            <input type="checkbox" value="600-1000" class="price-filter">
+            <span>₹600 to ₹1000</span>
+          </label>
+          <label class="filter-option">
+            <input type="checkbox" value="1000+" class="price-filter">
+            <span>₹1000+</span>
+          </label>
+        </div>
+        
+        <div class="filter-section">
+          <div class="filter-title">More Filters</div>
+          <label class="filter-option">
+            <input type="checkbox" id="vegOnly">
+            <span>Pure Veg</span>
+          </label>
+          <label class="filter-option">
+            <input type="checkbox" id="freeDelivery">
+            <span>Free Delivery</span>
+          </label>
+          <label class="filter-option">
+            <input type="checkbox" id="openNow">
+            <span>Open Now</span>
+          </label>
+        </div>
+      </aside>
+      
+      <!-- Restaurant List -->
+      <div>
+        <!-- Map View -->
+        <div id="restaurantsMap"></div>
+        
+        <div class="flex justify-between items-center mb-md">
+          <h2 id="resultsTitle">All Restaurants</h2>
+          <span id="resultsCount" style="color: var(--dark-gray);"></span>
+        </div>
+        
+        <div class="restaurant-grid" id="restaurantGrid">
+          <!-- Restaurants loaded dynamically -->
+        </div>
+        
+        <div id="loadMoreContainer" style="text-align: center; margin-top: var(--xl); display: none;">
+          <button class="btn btn-outline" id="loadMoreBtn">Load More</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Cart Sidebar -->
+  <div class="overlay" id="overlay"></div>
+  <div class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+      <h3><i class="fas fa-shopping-cart"></i> Your Cart</h3>
+      <button class="btn btn-ghost" id="closeCart">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="cart-body" id="cartBody"></div>
+    <div class="cart-footer" id="cartFooter" style="display: none;">
+      <div class="flex justify-between mb-sm">
+        <span>Subtotal</span>
+        <span id="cartSubtotal">₹0</span>
+      </div>
+      <div class="flex justify-between mb-md" style="font-weight: 600; font-size: 1.1rem;">
+        <span>Total</span>
+        <span id="cartTotal">₹0</span>
+      </div>
+      <a href="./checkout.html" class="btn btn-primary btn-full btn-lg">Proceed to Checkout</a>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/cart.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    const RestaurantsPage = {
+      filters: {
+        page: 1,
+        limit: 20,
+        sort: 'relevance',
+        cuisine: [],
+        rating: null,
+        priceRange: null,
+        veg: false,
+        openNow: false,
+        search: ''
+      },
+      hasMore: true,
+      isLoading: false,
+      
+      init() {
+        this.parseQueryParams();
+        this.setupEventListeners();
+        this.loadCuisines();
+        this.loadRestaurants();
+        this.initMap();
+      },
+      
+      initMap() {
+        // Delhi coordinates as default
+        const defaultLat = 28.6139;
+        const defaultLng = 77.2090;
+        
+        // Initialize map
+        this.map = L.map('restaurantsMap').setView([defaultLat, defaultLng], 13);
+        
+        // Add OpenStreetMap tiles (FREE)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(this.map);
+        
+        // Store markers array
+        this.markers = [];
+      },
+      
+      updateMapMarkers(restaurants) {
+        // Clear existing markers
+        this.markers.forEach(marker => this.map.removeLayer(marker));
+        this.markers = [];
+        
+        if (!restaurants || restaurants.length === 0) return;
+        
+        const bounds = [];
+        
+        restaurants.forEach(restaurant => {
+          if (restaurant.location?.lat && restaurant.location?.lng) {
+            const lat = restaurant.location.lat;
+            const lng = restaurant.location.lng;
+            
+            // Create custom marker
+            const marker = L.marker([lat, lng], {
+              icon: L.divIcon({
+                html: `<div class="custom-marker-restaurant">🍽️ ${restaurant.name.substring(0, 15)}${restaurant.name.length > 15 ? '...' : ''}</div>`,
+                className: 'custom-marker',
+                iconSize: [120, 30]
+              })
+            }).addTo(this.map);
+            
+            // Add popup with restaurant info
+            marker.bindPopup(`
+              <div style="text-align:center;">
+                <strong>${restaurant.name}</strong><br>
+                ⭐ ${restaurant.rating || '4.0'} | ${restaurant.cuisine?.[0] || 'Food'}<br>
+                <a href="./restaurant.html?id=${restaurant.id}" style="color:#e74c3c;">View Menu →</a>
+              </div>
+            `);
+            
+            this.markers.push(marker);
+            bounds.push([lat, lng]);
+          }
+        });
+        
+        // Fit map to show all markers
+        if (bounds.length > 0) {
+          this.map.fitBounds(bounds, { padding: [50, 50] });
+        }
+      },
+      
+      parseQueryParams() {
+        const params = Utils.getQueryParams();
+        
+        if (params.search) {
+          this.filters.search = params.search;
+          document.getElementById('searchInput').value = params.search;
+          document.getElementById('resultsTitle').textContent = `Search: "${params.search}"`;
+        }
+        
+        if (params.cuisine) {
+          this.filters.cuisine = [params.cuisine];
+        }
+        
+        if (params.veg === 'true') {
+          this.filters.veg = true;
+          document.getElementById('vegOnly').checked = true;
+        }
+        
+        if (params.sort) {
+          this.filters.sort = params.sort;
+          document.querySelector(`[data-sort="${params.sort}"]`)?.classList.add('active');
+        }
+      },
+      
+      setupEventListeners() {
+        // Sort dropdown
+        const sortBtn = document.getElementById('sortBtn');
+        const sortMenu = document.getElementById('sortMenu');
+        
+        sortBtn?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          sortMenu.classList.toggle('show');
+        });
+        
+        document.addEventListener('click', () => {
+          sortMenu?.classList.remove('show');
+        });
+        
+        // Sort options
+        document.querySelectorAll('.sort-option').forEach(option => {
+          option.addEventListener('click', () => {
+            document.querySelectorAll('.sort-option').forEach(o => o.classList.remove('active'));
+            option.classList.add('active');
+            
+            this.filters.sort = option.dataset.sort;
+            document.getElementById('sortLabel').textContent = option.textContent;
+            this.filters.page = 1;
+            this.loadRestaurants();
+          });
+        });
+        
+        // Cuisine filters
+        document.getElementById('cuisineFilters')?.addEventListener('change', () => {
+          const checked = document.querySelectorAll('.cuisine-filter:checked');
+          this.filters.cuisine = Array.from(checked).map(c => c.value);
+          this.filters.page = 1;
+          this.loadRestaurants();
+        });
+        
+        // Rating filters
+        document.querySelectorAll('.rating-filter').forEach(filter => {
+          filter.addEventListener('change', () => {
+            document.querySelectorAll('.rating-filter').forEach(f => {
+              if (f !== filter) f.checked = false;
+            });
+            this.filters.rating = filter.checked ? filter.value : null;
+            this.filters.page = 1;
+            this.loadRestaurants();
+          });
+        });
+        
+        // Price filters
+        document.querySelectorAll('.price-filter').forEach(filter => {
+          filter.addEventListener('change', () => {
+            document.querySelectorAll('.price-filter').forEach(f => {
+              if (f !== filter) f.checked = false;
+            });
+            this.filters.priceRange = filter.checked ? filter.value : null;
+            this.filters.page = 1;
+            this.loadRestaurants();
+          });
+        });
+        
+        // Veg only
+        document.getElementById('vegOnly')?.addEventListener('change', (e) => {
+          this.filters.veg = e.target.checked;
+          this.filters.page = 1;
+          this.loadRestaurants();
+        });
+        
+        // Open now
+        document.getElementById('openNow')?.addEventListener('change', (e) => {
+          this.filters.openNow = e.target.checked;
+          this.filters.page = 1;
+          this.loadRestaurants();
+        });
+        
+        // Search
+        const searchInput = document.getElementById('searchInput');
+        searchInput?.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            this.filters.search = searchInput.value;
+            this.filters.page = 1;
+            this.loadRestaurants();
+          }
+        });
+        
+        // Load more
+        document.getElementById('loadMoreBtn')?.addEventListener('click', () => {
+          this.filters.page++;
+          this.loadRestaurants(true);
+        });
+        
+        // Mobile filters
+        if (window.innerWidth <= 768) {
+          document.getElementById('mobileFilters').style.display = 'flex';
+        }
+      },
+      
+      async loadCuisines() {
+        const container = document.getElementById('cuisineFilters');
+        if (!container) return;
+        
+        const cuisines = ['North Indian', 'South Indian', 'Chinese', 'Italian', 'Biryani', 
+                         'Pizza', 'Burger', 'Desserts', 'Beverages', 'Fast Food'];
+        
+        container.innerHTML = cuisines.map(c => `
+          <label class="filter-option">
+            <input type="checkbox" value="${c}" class="cuisine-filter"
+                   ${this.filters.cuisine.includes(c) ? 'checked' : ''}>
+            <span>${c}</span>
+          </label>
+        `).join('');
+      },
+      
+      async loadRestaurants(append = false) {
+        if (this.isLoading) return;
+        this.isLoading = true;
+        
+        const container = document.getElementById('restaurantGrid');
+        if (!append) {
+          Utils.showLoading(container, 'Finding best restaurants near you...');
+        }
+        
+        try {
+          const location = Utils.getUserLocation();
+          const params = {
+            page: this.filters.page,
+            limit: this.filters.limit,
+            sort: this.filters.sort === 'relevance' ? 'rating' : this.filters.sort,
+            ...(this.filters.cuisine.length > 0 && { cuisine: this.filters.cuisine.join(',') }),
+            ...(this.filters.rating && { rating: this.filters.rating }),
+            ...(this.filters.priceRange && { priceRange: this.filters.priceRange }),
+            ...(this.filters.veg && { veg: true }),
+            ...(this.filters.openNow && { isOpen: true }),
+            ...(this.filters.search && { search: this.filters.search }),
+            ...(location.lat && { lat: location.lat }),
+            ...(location.lng && { lng: location.lng })
+          };
+          
+          const result = await API.restaurants.getAll(params);
+          
+          if (result.success) {
+            this.renderRestaurants(result.data.restaurants);
+            this.updateMapMarkers(result.data.restaurants);
+            document.getElementById('resultsCount').textContent = `${result.data.total} restaurants`;
+            this.hasMore = result.data.hasMore;
+            document.getElementById('loadMoreContainer').style.display = this.hasMore ? 'block' : 'none';
+          }
+        } catch (error) {
+          if (!append) {
+            Utils.showError(container, 'Failed to load restaurants');
+          }
+        } finally {
+          this.isLoading = false;
+        }
+      }
+    };
+    
+    // Toggle user dropdown menu
+    function toggleUserDropdown() {
+      const dropdown = document.getElementById('userDropdown');
+      if (dropdown) {
+        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+      }
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      Cart.init();
+      RestaurantsPage.init();
+    });
+  </script>
+</body>
+</html>

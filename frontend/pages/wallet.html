@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Wallet - FoodZap</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .wallet-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: var(--lg);
+    }
+    
+    .wallet-balance-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: var(--xl);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--lg);
+    }
+    
+    .balance-label {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      margin-bottom: var(--sm);
+    }
+    
+    .balance-amount {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: var(--md);
+    }
+    
+    .wallet-actions {
+      display: flex;
+      gap: var(--md);
+    }
+    
+    .wallet-btn {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: none;
+      padding: var(--sm) var(--md);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: var(--sm);
+      transition: all 0.2s;
+    }
+    
+    .wallet-btn:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    
+    .section-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: var(--lg);
+      margin-bottom: var(--lg);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: var(--md);
+      display: flex;
+      align-items: center;
+      gap: var(--sm);
+    }
+    
+    .subscription-plans {
+      display: grid;
+      gap: var(--md);
+    }
+    
+    .plan-card {
+      border: 2px solid var(--light-gray);
+      border-radius: var(--radius-md);
+      padding: var(--lg);
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    
+    .plan-card:hover {
+      border-color: var(--primary);
+    }
+    
+    .plan-card.selected {
+      border-color: var(--primary);
+      background: rgba(255,107,107,0.05);
+    }
+    
+    .plan-card.popular {
+      border-color: var(--primary);
+    }
+    
+    .plan-card.popular::before {
+      content: 'MOST POPULAR';
+      position: absolute;
+      top: -10px;
+      right: 20px;
+      background: var(--primary);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    
+    .plan-name {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: var(--xs);
+    }
+    
+    .plan-price {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: var(--sm);
+    }
+    
+    .plan-price span {
+      font-size: 0.9rem;
+      color: var(--gray);
+      font-weight: 400;
+    }
+    
+    .plan-features {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .plan-features li {
+      padding: 6px 0;
+      display: flex;
+      align-items: center;
+      gap: var(--sm);
+      font-size: 0.9rem;
+    }
+    
+    .plan-features li i {
+      color: var(--success);
+    }
+    
+    .transaction-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--md);
+      border-bottom: 1px solid var(--light-gray);
+    }
+    
+    .transaction-item:last-child {
+      border-bottom: none;
+    }
+    
+    .transaction-info {
+      display: flex;
+      align-items: center;
+      gap: var(--md);
+    }
+    
+    .transaction-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+    
+    .transaction-icon.credit {
+      background: rgba(0,184,148,0.1);
+      color: var(--success);
+    }
+    
+    .transaction-icon.debit {
+      background: rgba(255,107,107,0.1);
+      color: var(--danger);
+    }
+    
+    .transaction-icon.cashback {
+      background: rgba(255,193,7,0.1);
+      color: #ffc107;
+    }
+    
+    .transaction-details h4 {
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    
+    .transaction-details p {
+      font-size: 0.85rem;
+      color: var(--gray);
+    }
+    
+    .transaction-amount {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    
+    .transaction-amount.credit {
+      color: var(--success);
+    }
+    
+    .transaction-amount.debit {
+      color: var(--danger);
+    }
+    
+    .add-money-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .add-money-modal.show {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: var(--xl);
+      width: 100%;
+      max-width: 400px;
+    }
+    
+    .amount-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sm);
+      margin-bottom: var(--md);
+    }
+    
+    .amount-btn {
+      padding: var(--md);
+      border: 2px solid var(--light-gray);
+      background: white;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    
+    .amount-btn:hover, .amount-btn.selected {
+      border-color: var(--primary);
+      background: rgba(255,107,107,0.05);
+    }
+    
+    .custom-amount {
+      width: 100%;
+      padding: var(--md);
+      border: 2px solid var(--light-gray);
+      border-radius: var(--radius-md);
+      font-size: 1.1rem;
+      margin-bottom: var(--md);
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--md);
+      margin-bottom: var(--lg);
+    }
+    
+    .stat-card {
+      background: white;
+      border-radius: var(--radius-md);
+      padding: var(--md);
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--gray);
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container header-content">
+      <a href="index.html" class="logo">
+        <span class="logo-icon">🍕</span>
+        <span>FoodZap</span>
+      </a>
+      <div style="font-weight: 600;">My Wallet</div>
+      <button class="btn btn-ghost" onclick="window.location.href='profile.html'">
+        <i class="fas fa-arrow-left"></i> Back
+      </button>
+    </div>
+  </header>
+
+  <main class="wallet-container">
+    <!-- Balance Card -->
+    <div class="wallet-balance-card">
+      <div class="balance-label">Available Balance</div>
+      <div class="balance-amount" id="walletBalance">₹0</div>
+      <div class="wallet-actions">
+        <button class="wallet-btn" onclick="WalletPage.showAddMoney()">
+          <i class="fas fa-plus"></i> Add Money
+        </button>
+        <button class="wallet-btn" onclick="WalletPage.viewTransactions()">
+          <i class="fas fa-list"></i> History
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid" id="walletStats">
+      <div class="stat-card">
+        <div class="stat-value" id="totalAdded">₹0</div>
+        <div class="stat-label">Total Added</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="totalSpent">₹0</div>
+        <div class="stat-label">Total Spent</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="totalCashback">₹0</div>
+        <div class="stat-label">Cashback</div>
+      </div>
+    </div>
+
+    <!-- Subscription Plans -->
+    <div class="section-card">
+      <div class="section-title">
+        <i class="fas fa-crown" style="color: #ffc107;"></i>
+        FoodZap Membership
+      </div>
+      <div id="currentSubscription" style="display: none; margin-bottom: var(--md);">
+        <!-- Current subscription will be shown here -->
+      </div>
+      <div class="subscription-plans" id="subscriptionPlans">
+        <!-- Plans loaded dynamically -->
+      </div>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="section-card">
+      <div class="section-title">
+        <i class="fas fa-history"></i>
+        Recent Transactions
+      </div>
+      <div id="transactionsList">
+        <!-- Transactions loaded dynamically -->
+      </div>
+      <div style="text-align: center; margin-top: var(--md);">
+        <button class="btn btn-ghost" onclick="WalletPage.viewAllTransactions()">
+          View All <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add Money Modal -->
+  <div class="add-money-modal" id="addMoneyModal">
+    <div class="modal-content">
+      <h3 style="margin-bottom: var(--md);">Add Money to Wallet</h3>
+      <div class="amount-buttons">
+        <button class="amount-btn" data-amount="100">₹100</button>
+        <button class="amount-btn" data-amount="200">₹200</button>
+        <button class="amount-btn" data-amount="500">₹500</button>
+        <button class="amount-btn" data-amount="1000">₹1000</button>
+        <button class="amount-btn" data-amount="2000">₹2000</button>
+        <button class="amount-btn" data-amount="5000">₹5000</button>
+      </div>
+      <input type="number" class="custom-amount" id="customAmount" placeholder="Enter custom amount">
+      <div style="display: flex; gap: var(--md);">
+        <button class="btn btn-secondary" style="flex: 1;" onclick="WalletPage.hideAddMoney()">Cancel</button>
+        <button class="btn btn-primary" style="flex: 1;" onclick="WalletPage.addMoney()">Add Money</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    const WalletPage = {
+      wallet: null,
+      selectedAmount: null,
+      
+      async init() {
+        if (!App.requireAuth()) return;
+        
+        await this.loadWallet();
+        await this.loadSubscription();
+        await this.loadTransactions();
+        this.setupEventListeners();
+      },
+      
+      async loadWallet() {
+        try {
+          const result = await API.wallet.getWallet();
+          if (result.success) {
+            this.wallet = result.data;
+            this.renderWallet();
+          }
+        } catch (error) {
+          Utils.showToast('Failed to load wallet', 'error');
+        }
+      },
+      
+      renderWallet() {
+        if (!this.wallet) return;
+        
+        const { wallet, stats } = this.wallet;
+        
+        document.getElementById('walletBalance').textContent = Utils.formatPrice(wallet.balance);
+        document.getElementById('totalAdded').textContent = Utils.formatPrice(stats.totalCredited);
+        document.getElementById('totalSpent').textContent = Utils.formatPrice(stats.totalDebited);
+        document.getElementById('totalCashback').textContent = Utils.formatPrice(stats.totalCashback);
+      },
+      
+      async loadTransactions() {
+        try {
+          const result = await API.wallet.getTransactions(1, 5);
+          if (result.success) {
+            this.renderTransactions(result.data.transactions);
+          }
+        } catch (error) {
+          console.error('Failed to load transactions', error);
+        }
+      },
+      
+      renderTransactions(transactions) {
+        const container = document.getElementById('transactionsList');
+        
+        if (!transactions || transactions.length === 0) {
+          container.innerHTML = '<p style="text-align: center; color: var(--gray); padding: var(--lg);">No transactions yet</p>';
+          return;
+        }
+        
+        const icons = {
+          credit: 'fa-arrow-down',
+          debit: 'fa-arrow-up',
+          cashback: 'fa-gift',
+          refund: 'fa-undo'
+        };
+        
+        container.innerHTML = transactions.map(t => `
+          <div class="transaction-item">
+            <div class="transaction-info">
+              <div class="transaction-icon ${t.type}">
+                <i class="fas ${icons[t.type] || 'fa-circle'}"></i>
+              </div>
+              <div class="transaction-details">
+                <h4>${t.description}</h4>
+                <p>${new Date(t.createdAt).toLocaleDateString()}</p>
+              </div>
+            </div>
+            <div class="transaction-amount ${t.type === 'debit' ? 'debit' : 'credit'}">
+              ${t.type === 'debit' ? '-' : '+'}${Utils.formatPrice(t.amount)}
+            </div>
+          </div>
+        `).join('');
+      },
+      
+      async loadSubscription() {
+        try {
+          const [subscriptionResult, plansResult] = await Promise.all([
+            API.wallet.getSubscription(),
+            API.wallet.getSubscriptionPlans()
+          ]);
+          
+          if (plansResult.success) {
+            this.renderPlans(plansResult.data, subscriptionResult.data);
+          }
+        } catch (error) {
+          console.error('Failed to load subscription', error);
+        }
+      },
+      
+      renderPlans(plans, currentSub) {
+        const container = document.getElementById('subscriptionPlans');
+        
+        // Show current subscription if active
+        if (currentSub && currentSub.subscription?.isActive) {
+          const subDiv = document.getElementById('currentSubscription');
+          subDiv.style.display = 'block';
+          subDiv.innerHTML = `
+            <div style="background: rgba(255,193,7,0.1); border: 1px solid #ffc107; border-radius: var(--radius-md); padding: var(--md);">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="font-weight: 600;">${currentSub.subscription.plan}</div>
+                  <div style="font-size: 0.85rem; color: var(--gray);">Valid until ${new Date(currentSub.subscription.endDate).toLocaleDateString()}</div>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="WalletPage.cancelSubscription()">Cancel</button>
+              </div>
+            </div>
+          `;
+        }
+        
+        container.innerHTML = plans.map(plan => `
+          <div class="plan-card ${plan.name === 'Pro' ? 'popular' : ''} ${currentSub?.subscription?.plan === plan.name ? 'selected' : ''}"
+               onclick="WalletPage.selectPlan('${plan._id}', '${plan.name}')">
+            <div class="plan-name">${plan.displayName}</div>
+            <div class="plan-price">₹${plan.price.monthly}<span>/month</span></div>
+            <div style="color: var(--gray); font-size: 0.9rem; margin-bottom: var(--md);">or ₹${plan.price.yearly}/year</div>
+            <ul class="plan-features">
+              ${plan.features.map(f => `
+                <li><i class="fas fa-check"></i> ${f.name}</li>
+              `).join('')}
+            </ul>
+            <button class="btn btn-primary" style="width: 100%; margin-top: var(--md);">
+              ${currentSub?.subscription?.plan === plan.name ? 'Current Plan' : 'Subscribe'}
+            </button>
+          </div>
+        `).join('');
+      },
+      
+      setupEventListeners() {
+        // Amount button selection
+        document.querySelectorAll('.amount-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            this.selectedAmount = parseInt(btn.dataset.amount);
+            document.getElementById('customAmount').value = '';
+          });
+        });
+        
+        // Custom amount input
+        document.getElementById('customAmount').addEventListener('input', (e) => {
+          document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
+          this.selectedAmount = parseInt(e.target.value) || null;
+        });
+      },
+      
+      showAddMoney() {
+        document.getElementById('addMoneyModal').classList.add('show');
+      },
+      
+      hideAddMoney() {
+        document.getElementById('addMoneyModal').classList.remove('show');
+      },
+      
+      async addMoney() {
+        if (!this.selectedAmount || this.selectedAmount < 10) {
+          Utils.showToast('Please select or enter a valid amount (min ₹10)', 'warning');
+          return;
+        }
+        
+        // In real app, this would open Razorpay to add money
+        // For demo, we'll simulate adding money
+        Utils.showToast('Redirecting to payment...', 'info');
+        
+        // Simulate successful payment
+        setTimeout(async () => {
+          try {
+            const result = await API.wallet.addMoney(this.selectedAmount, 'card', 'demo-payment-id');
+            if (result.success) {
+              Utils.showToast(`₹${this.selectedAmount} added to wallet!`, 'success');
+              this.hideAddMoney();
+              await this.loadWallet();
+              await this.loadTransactions();
+            }
+          } catch (error) {
+            Utils.showToast('Failed to add money', 'error');
+          }
+        }, 1500);
+      },
+      
+      async selectPlan(planId, planName) {
+        if (confirm(`Subscribe to ${planName}?`)) {
+          try {
+            const result = await API.wallet.subscribe(planId, 'monthly', 'wallet');
+            if (result.success) {
+              Utils.showToast('Subscription activated!', 'success');
+              await this.loadSubscription();
+              await this.loadWallet();
+            }
+          } catch (error) {
+            Utils.showToast('Subscription failed. Check wallet balance.', 'error');
+          }
+        }
+      },
+      
+      async cancelSubscription() {
+        if (confirm('Cancel your subscription? Benefits will remain until end of billing period.')) {
+          try {
+            const result = await API.wallet.cancelSubscription('User requested');
+            if (result.success) {
+              Utils.showToast('Subscription cancelled', 'success');
+              await this.loadSubscription();
+            }
+          } catch (error) {
+            Utils.showToast('Failed to cancel', 'error');
+          }
+        }
+      },
+      
+      viewTransactions() {
+        window.location.href = 'transactions.html';
+      },
+      
+      viewAllTransactions() {
+        window.location.href = 'transactions.html';
+      }
+    };
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      WalletPage.init();
+    });
+  </script>
+</body>
+</html>

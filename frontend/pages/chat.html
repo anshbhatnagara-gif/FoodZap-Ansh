@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Support Chat - FoodZap</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .chat-container {
+      max-width: 900px;
+      margin: 0 auto;
+      height: calc(100vh - 80px);
+      display: flex;
+      flex-direction: column;
+      background: white;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+    
+    .chat-header {
+      padding: var(--md) var(--lg);
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: var(--md);
+    }
+    
+    .chat-header img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid white;
+    }
+    
+    .chat-header-info h3 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+    
+    .chat-header-info p {
+      margin: 0;
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+    
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--md);
+      background: #f8f9fa;
+    }
+    
+    .message {
+      display: flex;
+      margin-bottom: var(--md);
+      animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .message.user {
+      justify-content: flex-end;
+    }
+    
+    .message.support {
+      justify-content: flex-start;
+    }
+    
+    .message-bubble {
+      max-width: 70%;
+      padding: var(--sm) var(--md);
+      border-radius: var(--radius-lg);
+      position: relative;
+    }
+    
+    .message.user .message-bubble {
+      background: var(--primary);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+    
+    .message.support .message-bubble {
+      background: white;
+      color: var(--dark);
+      border-bottom-left-radius: 4px;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .message-time {
+      font-size: 0.75rem;
+      opacity: 0.7;
+      margin-top: 4px;
+      text-align: right;
+    }
+    
+    .chat-input {
+      padding: var(--md);
+      background: white;
+      border-top: 1px solid var(--light-gray);
+      display: flex;
+      gap: var(--sm);
+    }
+    
+    .chat-input input {
+      flex: 1;
+      padding: var(--sm) var(--md);
+      border: 1px solid var(--light-gray);
+      border-radius: var(--radius-full);
+      font-size: 1rem;
+      outline: none;
+    }
+    
+    .chat-input input:focus {
+      border-color: var(--primary);
+    }
+    
+    .chat-input button {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    
+    .chat-input button:hover {
+      background: var(--primary-dark);
+      transform: scale(1.05);
+    }
+    
+    .quick-actions {
+      display: flex;
+      gap: var(--sm);
+      padding: var(--sm) var(--md);
+      overflow-x: auto;
+      background: white;
+      border-top: 1px solid var(--light-gray);
+    }
+    
+    .quick-action {
+      white-space: nowrap;
+      padding: var(--xs) var(--md);
+      background: var(--lighter-gray);
+      border-radius: var(--radius-full);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .quick-action:hover {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .typing-indicator {
+      display: none;
+      padding: var(--sm) var(--md);
+      color: var(--gray);
+      font-size: 0.85rem;
+    }
+    
+    .typing-indicator.show {
+      display: flex;
+      align-items: center;
+      gap: var(--xs);
+    }
+    
+    .typing-dots {
+      display: flex;
+      gap: 3px;
+    }
+    
+    .typing-dots span {
+      width: 6px;
+      height: 6px;
+      background: var(--gray);
+      border-radius: 50%;
+      animation: typing 1.4s infinite;
+    }
+    
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    
+    @keyframes typing {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container header-content">
+      <a href="./index.html" class="logo">
+        <span class="logo-icon">🍕</span>
+        <span>FoodZap</span>
+      </a>
+      <nav class="nav-links">
+        <a href="./restaurants.html">Restaurants</a>
+        <a href="./instamart.html">Instamart</a>
+        <a href="./offers.html">Offers</a>
+        <a href="./wallet.html">Wallet</a>
+      </nav>
+      <div class="header-actions">
+        <a href="./cart.html" class="btn btn-ghost cart-btn">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="cart-badge" id="cartBadge">0</span>
+        </a>
+        <a href="./profile.html" class="btn btn-ghost">
+          <i class="fas fa-user"></i>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main style="padding: var(--md); background: var(--lighter-gray); min-height: calc(100vh - 80px);">
+    <div class="chat-container">
+      <div class="chat-header">
+        <img src="https://ui-avatars.com/api/?name=FoodZap+Support&background=e74c3c&color=fff" alt="Support">
+        <div class="chat-header-info">
+          <h3>FoodZap Support</h3>
+          <p><span class="live-badge">Online</span> | Typically replies in 2 minutes</p>
+        </div>
+      </div>
+      
+      <div class="chat-messages" id="chatMessages">
+        <div class="message support">
+          <div class="message-bubble">
+            <p>👋 Hello! Welcome to FoodZap Support. How can I help you today?</p>
+            <div class="message-time">Just now</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="typing-indicator" id="typingIndicator">
+        Support is typing
+        <div class="typing-dots">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+      
+      <div class="quick-actions">
+        <span class="quick-action" onclick="ChatPage.sendQuickMessage('Order status')">📦 Order Status</span>
+        <span class="quick-action" onclick="ChatPage.sendQuickMessage('Refund issue')">💰 Refund</span>
+        <span class="quick-action" onclick="ChatPage.sendQuickMessage('Delivery delayed')">🚗 Late Delivery</span>
+        <span class="quick-action" onclick="ChatPage.sendQuickMessage('Wrong item received')">❌ Wrong Item</span>
+        <span class="quick-action" onclick="ChatPage.sendQuickMessage('Speak to human')">👤 Human Agent</span>
+      </div>
+      
+      <div class="chat-input">
+        <input type="text" id="messageInput" placeholder="Type your message..." onkeypress="if(event.key==='Enter')ChatPage.sendMessage()">
+        <button onclick="ChatPage.sendMessage()">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/utils.js"></script>
+  <script>
+    const ChatPage = {
+      socket: null,
+      userId: null,
+      
+      init() {
+        this.userId = Utils.getUserId();
+        this.loadChatHistory();
+        this.initWebSocket();
+        this.setupEventListeners();
+      },
+      
+      initWebSocket() {
+        try {
+          this.socket = io(CONFIG.API_BASE_URL.replace('/api', ''));
+          
+          this.socket.emit('join-chat', this.userId);
+          
+          this.socket.on('new-message', (data) => {
+            this.displayMessage(data.message, 'support', data.timestamp);
+          });
+          
+          this.socket.on('typing', () => {
+            this.showTypingIndicator();
+          });
+        } catch (error) {
+          console.error('WebSocket error:', error);
+        }
+      },
+      
+      async loadChatHistory() {
+        try {
+          const result = await API.support.getChatHistory();
+          if (result.success && result.data.length > 0) {
+            document.getElementById('chatMessages').innerHTML = '';
+            result.data.forEach(msg => {
+              this.displayMessage(msg.content, msg.sender, msg.timestamp);
+            });
+          }
+        } catch (error) {
+          console.log('No chat history');
+        }
+      },
+      
+      sendMessage() {
+        const input = document.getElementById('messageInput');
+        const message = input.value.trim();
+        
+        if (!message) return;
+        
+        this.displayMessage(message, 'user', new Date());
+        input.value = '';
+        
+        // Call Gemini AI for response
+        this.callGeminiAI(message);
+      },
+      
+      sendQuickMessage(message) {
+        document.getElementById('messageInput').value = message;
+        this.sendMessage();
+      },
+      
+      async callGeminiAI(userMessage) {
+        this.showTypingIndicator();
+        
+        try {
+c          // Build headers - auth optional for chat
+          const headers = {
+            'Content-Type': 'application/json'
+          };
+          const token = API.auth.getToken();
+          if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+          }
+          
+          // Call backend AI service
+          const response = await fetch(`${CONFIG.API_BASE_URL}/ai/chat`, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({
+              message: userMessage,
+              history: this.chatHistory || []
+            })
+          });
+          
+          const data = await response.json();
+          
+          this.hideTypingIndicator();
+          
+          if (data.success) {
+            this.displayMessage(data.response, 'support', new Date());
+            // Save to history
+            this.chatHistory = data.history || [];
+          } else {
+            // Use fallback if AI fails
+            this.simulateAIResponse(userMessage);
+          }
+        } catch (error) {
+          console.error('AI Chat Error:', error);
+          this.hideTypingIndicator();
+          // Use fallback response
+          this.simulateAIResponse(userMessage);
+        }
+      },
+      
+      // Fallback to static responses if AI is not available
+      simulateAIResponse(userMessage) {
+        this.showTypingIndicator();
+        
+        const responses = {
+          'order': 'I can help you track your order. Please provide your order ID (e.g., #12345)',
+          'refund': 'For refund requests, please share your order ID and reason. Refunds typically process within 5-7 business days.',
+          'delivery': 'I understand your concern about delivery. Let me check the status for you. What\'s your order ID?',
+          'food': 'I can suggest food based on your mood! Are you feeling happy, sad, tired, or hungry?',
+          'restaurant': 'Looking for restaurants? Check our restaurants page for top-rated options near you.',
+          'default': 'I\'m your FoodZap AI assistant! Ask me about food recommendations, order tracking, or restaurant suggestions.'
+        };
+        
+        let response = responses.default;
+        const lowerMsg = userMessage.toLowerCase();
+        
+        for (const [key, value] of Object.entries(responses)) {
+          if (lowerMsg.includes(key)) {
+            response = value;
+            break;
+          }
+        }
+        
+        setTimeout(() => {
+          this.hideTypingIndicator();
+          this.displayMessage(response, 'support', new Date());
+        }, 1500);
+      },
+      
+      displayMessage(text, sender, timestamp) {
+        const container = document.getElementById('chatMessages');
+        const time = timestamp ? new Date(timestamp).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+        
+        const html = `
+          <div class="message ${sender}">
+            <div class="message-bubble">
+              <p>${text}</p>
+              <div class="message-time">${time}</div>
+            </div>
+          </div>
+        `;
+        
+        container.insertAdjacentHTML('beforeend', html);
+        container.scrollTop = container.scrollHeight;
+      },
+      
+      showTypingIndicator() {
+        document.getElementById('typingIndicator').classList.add('show');
+      },
+      
+      hideTypingIndicator() {
+        document.getElementById('typingIndicator').classList.remove('show');
+      },
+      
+      setupEventListeners() {
+        // Auto-scroll to bottom
+        const container = document.getElementById('chatMessages');
+        container.scrollTop = container.scrollHeight;
+      }
+    };
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      ChatPage.init();
+    });
+  </script>
+</body>
+</html>

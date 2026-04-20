@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - FoodZap</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .auth-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      padding: var(--lg);
+    }
+    
+    .auth-box {
+      background: white;
+      border-radius: var(--radius-xl);
+      padding: var(--xl);
+      width: 100%;
+      max-width: 450px;
+      box-shadow: var(--shadow-xl);
+    }
+    
+    .auth-logo {
+      text-align: center;
+      margin-bottom: var(--lg);
+    }
+    
+    .auth-logo .logo-icon {
+      font-size: 3rem;
+    }
+    
+    .auth-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: var(--sm);
+    }
+    
+    .auth-subtitle {
+      text-align: center;
+      color: var(--gray);
+      margin-bottom: var(--lg);
+    }
+    
+    .form-group {
+      margin-bottom: var(--md);
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: var(--xs);
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: var(--sm) var(--md);
+      border: 2px solid var(--light-gray);
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    
+    .input-group {
+      position: relative;
+    }
+    
+    .input-group i {
+      position: absolute;
+      left: var(--md);
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray);
+    }
+    
+    .input-group .form-input {
+      padding-left: 2.5rem;
+    }
+    
+    .btn-full {
+      width: 100%;
+    }
+    
+    .auth-footer {
+      text-align: center;
+      margin-top: var(--lg);
+      padding-top: var(--lg);
+      border-top: 1px solid var(--light-gray);
+    }
+    
+    .auth-footer a {
+      color: var(--primary);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    
+    .social-login {
+      margin-top: var(--lg);
+    }
+    
+    .social-title {
+      text-align: center;
+      position: relative;
+      margin-bottom: var(--md);
+    }
+    
+    .social-title::before,
+    .social-title::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 30%;
+      height: 1px;
+      background: var(--light-gray);
+    }
+    
+    .social-title::before { left: 0; }
+    .social-title::after { right: 0; }
+    
+    .social-buttons {
+      display: flex;
+      gap: var(--sm);
+    }
+    
+    .btn-social {
+      flex: 1;
+      padding: var(--sm);
+      border: 1px solid var(--light-gray);
+      border-radius: var(--radius-md);
+      background: white;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .btn-social:hover {
+      background: var(--lighter-gray);
+    }
+    
+    .terms-text {
+      font-size: 0.85rem;
+      color: var(--gray);
+      text-align: center;
+      margin-top: var(--md);
+    }
+    
+    .terms-text a {
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-box">
+      <div class="auth-logo">
+        <span class="logo-icon">🍕</span>
+        <h1 style="font-size: 1.5rem; margin-top: var(--sm);">FoodZap</h1>
+      </div>
+      
+      <h2 class="auth-title">Create Account</h2>
+      <p class="auth-subtitle">Join FoodZap for delicious food delivered to your door</p>
+      
+      <form id="signupForm">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <div class="input-group">
+            <i class="fas fa-user"></i>
+            <input type="text" class="form-input" id="name" placeholder="Enter your full name" required>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <div class="input-group">
+            <i class="fas fa-envelope"></i>
+            <input type="email" class="form-input" id="email" placeholder="Enter your email" required>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <div class="input-group">
+            <i class="fas fa-phone"></i>
+            <input type="tel" class="form-input" id="phone" placeholder="Enter phone number" required>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="input-group">
+            <i class="fas fa-lock"></i>
+            <input type="password" class="form-input" id="password" placeholder="Create password" required minlength="6">
+          </div>
+        </div>
+        
+        <button type="submit" class="btn btn-primary btn-lg btn-full" id="signupBtn">
+          <i class="fas fa-user-plus"></i> Sign Up
+        </button>
+        
+        <p class="terms-text">
+          By signing up, you agree to our <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a>
+        </p>
+      </form>
+      
+      <div class="social-login">
+        <div class="social-title">Or continue with</div>
+        <div class="social-buttons">
+          <button class="btn-social" onclick="socialLogin('google')">
+            <i class="fab fa-google" style="color: #DB4437;"></i> Google
+          </button>
+          <button class="btn-social" onclick="socialLogin('facebook')">
+            <i class="fab fa-facebook" style="color: #4267B2;"></i> Facebook
+          </button>
+        </div>
+      </div>
+      
+      <div class="auth-footer">
+        Already have an account? <a href="login.html">Login</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/utils.js"></script>
+  <script>
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const btn = document.getElementById('signupBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+      
+      try {
+        const result = await API.auth.register({
+          name: document.getElementById('name').value,
+          email: document.getElementById('email').value,
+          phone: document.getElementById('phone').value,
+          password: document.getElementById('password').value
+        });
+        
+        if (result.success) {
+          Utils.showToast('Account created successfully!', 'success');
+          setTimeout(() => {
+            window.location.href = 'index.html';
+          }, 1500);
+        } else {
+          Utils.showToast(result.message || 'Failed to create account', 'error');
+        }
+      } catch (error) {
+        Utils.showToast('Network error. Please try again.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-user-plus"></i> Sign Up';
+      }
+    });
+    
+    function socialLogin(provider) {
+      Utils.showToast(`${provider} login coming soon!`, 'info');
+    }
+  </script>
+</body>
+</html>

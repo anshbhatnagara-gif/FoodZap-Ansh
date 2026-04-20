@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Orders - FoodZap</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .orders-container {
+      max-width: 900px;
+      margin: 100px auto;
+      padding: var(--lg) var(--md);
+    }
+    
+    .order-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: var(--lg);
+      margin-bottom: var(--md);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--light-gray);
+    }
+    
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--md);
+      padding-bottom: var(--md);
+      border-bottom: 1px solid var(--light-gray);
+    }
+    
+    .order-id {
+      font-weight: 600;
+      color: var(--dark);
+    }
+    
+    .order-date {
+      font-size: 0.85rem;
+      color: var(--gray);
+    }
+    
+    .order-status {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--xs);
+      padding: var(--xs) var(--sm);
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+    
+    .status-delivered {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .status-preparing {
+      background: #fff3cd;
+      color: #856404;
+    }
+    
+    .status-onway {
+      background: #cce5ff;
+      color: #004085;
+    }
+    
+    .status-cancelled {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    .order-items {
+      margin-bottom: var(--md);
+    }
+    
+    .order-item {
+      display: flex;
+      justify-content: space-between;
+      padding: var(--sm) 0;
+      border-bottom: 1px dashed var(--light-gray);
+    }
+    
+    .order-item:last-child {
+      border-bottom: none;
+    }
+    
+    .order-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: var(--md);
+      border-top: 1px solid var(--light-gray);
+    }
+    
+    .order-total {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    
+    .order-actions {
+      display: flex;
+      gap: var(--sm);
+    }
+    
+    .empty-orders {
+      text-align: center;
+      padding: var(--xl);
+    }
+    
+    .empty-orders i {
+      font-size: 4rem;
+      color: var(--light-gray);
+      margin-bottom: var(--md);
+    }
+    
+    .tracking-btn {
+      background: var(--primary);
+      color: white;
+      padding: var(--xs) var(--md);
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      font-size: 0.85rem;
+    }
+    
+    .reorder-btn {
+      background: var(--lighter-gray);
+      color: var(--dark);
+      padding: var(--xs) var(--md);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--light-gray);
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    
+    .tabs {
+      display: flex;
+      gap: var(--sm);
+      margin-bottom: var(--lg);
+      border-bottom: 2px solid var(--light-gray);
+    }
+    
+    .tab {
+      padding: var(--sm) var(--md);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+    }
+    
+    .tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container header-content">
+      <a href="./index.html" class="logo">
+        <span class="logo-icon">🍕</span>
+        <span>FoodZap</span>
+      </a>
+      <nav class="nav-links">
+        <a href="./index.html">Home</a>
+        <a href="./restaurants.html">Restaurants</a>
+        <a href="./instamart.html">Instamart</a>
+        <a href="./offers.html">Offers</a>
+      </nav>
+      <div class="header-actions">
+        <button class="btn btn-ghost" id="cartBtn">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="badge badge-primary" id="cartCount" style="display: none;">0</span>
+        </button>
+        <a href="./profile.html" class="btn btn-primary btn-sm">
+          <i class="fas fa-user"></i> Profile
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="orders-container">
+    <h1 style="margin-bottom: var(--lg);">
+      <i class="fas fa-clipboard-list" style="color: var(--primary);"></i> My Orders
+    </h1>
+    
+    <div class="tabs">
+      <div class="tab active" data-filter="all">All Orders</div>
+      <div class="tab" data-filter="active">Active</div>
+      <div class="tab" data-filter="delivered">Delivered</div>
+      <div class="tab" data-filter="cancelled">Cancelled</div>
+    </div>
+    
+    <div id="ordersList">
+      <!-- Orders loaded dynamically -->
+    </div>
+    
+    <div class="empty-orders" id="emptyState" style="display: none;">
+      <i class="fas fa-box-open"></i>
+      <h3>No orders yet</h3>
+      <p style="color: var(--gray); margin-bottom: var(--md);">Start ordering your favorite food!</p>
+      <a href="./restaurants.html" class="btn btn-primary">Browse Restaurants</a>
+    </div>
+  </main>
+
+  <!-- Cart Sidebar -->
+  <div class="overlay" id="overlay"></div>
+  <div class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+      <h3><i class="fas fa-shopping-cart"></i> Your Cart</h3>
+      <button class="btn btn-ghost" id="closeCart">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="cart-body" id="cartBody"></div>
+    <div class="cart-footer" id="cartFooter" style="display: none;">
+      <a href="./checkout.html" class="btn btn-primary btn-full btn-lg">Checkout</a>
+    </div>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/cart.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    const OrdersPage = {
+      orders: [],
+      currentFilter: 'all',
+      
+      init() {
+        this.loadOrders();
+        this.setupEventListeners();
+      },
+      
+      async loadOrders() {
+        const container = document.getElementById('ordersList');
+        
+        try {
+          // Check if user is logged in
+          const token = API.auth.getToken();
+          if (!token) {
+            container.innerHTML = `
+              <div class="empty-orders">
+                <i class="fas fa-user-lock"></i>
+                <h3>Please login</h3>
+                <p style="color: var(--gray); margin-bottom: var(--md);">Login to view your orders</p>
+                <a href="./login.html" class="btn btn-primary">Login</a>
+              </div>
+            `;
+            return;
+          }
+          
+          const result = await API.orders.getMyOrders();
+          
+          if (result.success && result.data.length > 0) {
+            this.orders = result.data;
+            this.renderOrders();
+          } else {
+            document.getElementById('emptyState').style.display = 'block';
+          }
+        } catch (error) {
+          console.error('Failed to load orders:', error);
+          // Show demo orders for testing
+          this.showDemoOrders();
+        }
+      },
+      
+      showDemoOrders() {
+        this.orders = [
+          {
+            id: 'FZ123456',
+            restaurant: { name: 'Pizza Hut' },
+            items: [
+              { name: 'Margherita Pizza', quantity: 1, price: 299 },
+              { name: 'Garlic Bread', quantity: 1, price: 149 }
+            ],
+            totalAmount: 448,
+            status: 'delivered',
+            createdAt: new Date(Date.now() - 86400000).toISOString(),
+            deliveryAddress: { street: '123 Main St, Mumbai' }
+          },
+          {
+            id: 'FZ123457',
+            restaurant: { name: 'Burger King' },
+            items: [
+              { name: 'Whopper', quantity: 2, price: 249 }
+            ],
+            totalAmount: 498,
+            status: 'on_the_way',
+            createdAt: new Date().toISOString(),
+            deliveryAddress: { street: '456 Park Ave, Mumbai' }
+          }
+        ];
+        this.renderOrders();
+      },
+      
+      renderOrders() {
+        const container = document.getElementById('ordersList');
+        const filtered = this.currentFilter === 'all' 
+          ? this.orders 
+          : this.orders.filter(o => {
+              if (this.currentFilter === 'active') return ['pending', 'confirmed', 'preparing', 'on_the_way'].includes(o.status);
+              if (this.currentFilter === 'delivered') return o.status === 'delivered';
+              if (this.currentFilter === 'cancelled') return o.status === 'cancelled';
+              return true;
+            });
+        
+        if (filtered.length === 0) {
+          document.getElementById('emptyState').style.display = 'block';
+          container.innerHTML = '';
+          return;
+        }
+        
+        document.getElementById('emptyState').style.display = 'none';
+        
+        container.innerHTML = filtered.map(order => {
+          const statusClass = {
+            'delivered': 'status-delivered',
+            'pending': 'status-preparing',
+            'confirmed': 'status-preparing',
+            'preparing': 'status-preparing',
+            'on_the_way': 'status-onway',
+            'cancelled': 'status-cancelled'
+          }[order.status] || 'status-preparing';
+          
+          const statusText = {
+            'delivered': 'Delivered',
+            'pending': 'Pending',
+            'confirmed': 'Confirmed',
+            'preparing': 'Preparing',
+            'on_the_way': 'On the way',
+            'cancelled': 'Cancelled'
+          }[order.status] || order.status;
+          
+          return `
+            <div class="order-card">
+              <div class="order-header">
+                <div>
+                  <div class="order-id">Order #${order.id}</div>
+                  <div class="order-date">${Utils.formatDate(order.createdAt)}</div>
+                  <div style="font-size: 0.9rem; color: var(--gray); margin-top: var(--xs);">
+                    <i class="fas fa-store"></i> ${order.restaurant?.name || 'Restaurant'}
+                  </div>
+                </div>
+                <span class="order-status ${statusClass}">
+                  <i class="fas fa-circle" style="font-size: 0.5rem;"></i> ${statusText}
+                </span>
+              </div>
+              
+              <div class="order-items">
+                ${order.items.map(item => `
+                  <div class="order-item">
+                    <span>${item.name} x ${item.quantity}</span>
+                    <span>${Utils.formatPrice(item.price * item.quantity)}</span>
+                  </div>
+                `).join('')}
+              </div>
+              
+              <div class="order-footer">
+                <div>
+                  <div class="order-total">Total: ${Utils.formatPrice(order.totalAmount)}</div>
+                  <div style="font-size: 0.85rem; color: var(--gray);">
+                    <i class="fas fa-map-marker-alt"></i> ${order.deliveryAddress?.street || 'Address'}
+                  </div>
+                </div>
+                <div class="order-actions">
+                  ${order.status !== 'cancelled' ? `
+                    <a href="./order-tracking.html?id=${order.id}" class="tracking-btn">
+                      <i class="fas fa-location-arrow"></i> Track
+                    </a>
+                  ` : ''}
+                  <button class="reorder-btn" onclick="OrdersPage.reorder('${order.id}')">
+                    <i class="fas fa-redo"></i> Reorder
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      },
+      
+      setupEventListeners() {
+        // Tab filtering
+        document.querySelectorAll('.tab').forEach(tab => {
+          tab.addEventListener('click', () => {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            this.currentFilter = tab.dataset.filter;
+            this.renderOrders();
+          });
+        });
+      },
+      
+      reorder(orderId) {
+        const order = this.orders.find(o => o.id === orderId);
+        if (!order) return;
+        
+        // Add items to cart
+        order.items.forEach(item => {
+          Cart.addItem({
+            menuItemId: item.id || Utils.generateId(),
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            restaurant: order.restaurant
+          });
+        });
+        
+        Utils.showToast('Items added to cart!', 'success');
+        setTimeout(() => {
+          window.location.href = './checkout.html';
+        }, 1000);
+      }
+    };
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      Cart.init();
+      OrdersPage.init();
+    });
+  </script>
+</body>
+</html>

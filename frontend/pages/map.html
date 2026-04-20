@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maps - FoodZap</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .maps-container {
+      max-width: 800px;
+      margin: 100px auto;
+      padding: var(--xl);
+      text-align: center;
+    }
+    
+    .maps-card {
+      background: white;
+      border-radius: var(--radius-xl);
+      padding: var(--xl);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .map-icon {
+      font-size: 4rem;
+      color: var(--primary);
+      margin-bottom: var(--md);
+    }
+    
+    .maps-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--md);
+      background: #4285F4;
+      color: white;
+      padding: var(--md) var(--xl);
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 600;
+      transition: all 0.3s;
+      margin: var(--sm);
+    }
+    
+    .maps-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(66, 133, 244, 0.4);
+    }
+    
+    .maps-btn i {
+      font-size: 1.3rem;
+    }
+    
+    .location-presets {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--md);
+      margin-top: var(--lg);
+    }
+    
+    .preset-btn {
+      background: var(--lighter-gray);
+      border: 2px solid var(--light-gray);
+      padding: var(--md);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .preset-btn:hover {
+      border-color: var(--primary);
+      background: rgba(255, 107, 107, 0.05);
+    }
+    
+    .preset-btn i {
+      color: var(--primary);
+      margin-bottom: var(--sm);
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container header-content">
+      <a href="./index.html" class="logo">
+        <span class="logo-icon">🍕</span>
+        <span>FoodZap</span>
+      </a>
+      <nav class="nav-links">
+        <a href="./index.html">Home</a>
+        <a href="./restaurants.html">Restaurants</a>
+        <a href="./chat.html">Support</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="maps-container">
+    <div class="maps-card">
+      <div class="map-icon">
+        <i class="fas fa-map-marked-alt"></i>
+      </div>
+      
+      <h1>Open in Google Maps</h1>
+      <p style="color: var(--gray); margin-bottom: var(--lg);">
+        View restaurants and delivery locations directly in Google Maps
+      </p>
+      
+      <a href="https://www.google.com/maps" target="_blank" class="maps-btn">
+        <i class="fab fa-google"></i>
+        Open Google Maps
+      </a>
+      
+      <div style="margin-top: var(--xl);">
+        <h3 style="margin-bottom: var(--md);">Quick Locations</h3>
+        <div class="location-presets">
+          <button class="preset-btn" onclick="openMaps('restaurants+near+me')">
+            <i class="fas fa-utensils" style="font-size: 1.5rem; display: block;"></i>
+            <strong>Nearby Restaurants</strong>
+          </button>
+          
+          <button class="preset-btn" onclick="openMaps('food+delivery')">
+            <i class="fas fa-motorcycle" style="font-size: 1.5rem; display: block;"></i>
+            <strong>Delivery Services</strong>
+          </button>
+          
+          <button class="preset-btn" onclick="openMaps('pizza')">
+            <i class="fas fa-pizza-slice" style="font-size: 1.5rem; display: block;"></i>
+            <strong>Pizza Places</strong>
+          </button>
+          
+          <button class="preset-btn" onclick="openMaps('burger')">
+            <i class="fas fa-hamburger" style="font-size: 1.5rem; display: block;"></i>
+            <strong>Burger Joints</strong>
+          </button>
+        </div>
+      </div>
+      
+      <div style="margin-top: var(--xl); padding-top: var(--lg); border-top: 1px solid var(--light-gray);">
+        <h3 style="margin-bottom: var(--md);">Current Location</h3>
+        <p id="currentLocation" style="color: var(--gray);">
+          <i class="fas fa-spinner fa-spin"></i> Detecting location...
+        </p>
+        <button class="btn btn-primary" style="margin-top: var(--md);" onclick="openCurrentLocation()">
+          <i class="fas fa-location-arrow"></i> Open My Location
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/utils.js"></script>
+  <script>
+    // Detect and show current location
+    async function detectLocation() {
+      const locationEl = document.getElementById('currentLocation');
+      
+      if (!navigator.geolocation) {
+        locationEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Geolocation not supported';
+        return;
+      }
+      
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          
+          // Save to storage
+          Utils.saveUserLocation({ lat, lng });
+          
+          locationEl.innerHTML = `
+            <strong>Latitude:</strong> ${lat.toFixed(6)}<br>
+            <strong>Longitude:</strong> ${lng.toFixed(6)}<br>
+            <span style="font-size: 0.9rem; color: var(--success);">
+              <i class="fas fa-check-circle"></i> Location detected
+            </span>
+          `;
+        },
+        (error) => {
+          locationEl.innerHTML = `
+            <i class="fas fa-map-marker-alt"></i> Using default location (Mumbai)<br>
+            <span style="font-size: 0.85rem;">Enable location access for accurate results</span>
+          `;
+        }
+      );
+    }
+    
+    // Open Google Maps with search query
+    function openMaps(query) {
+      const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+      window.open(url, '_blank');
+    }
+    
+    // Open current location in Google Maps
+    function openCurrentLocation() {
+      const location = Utils.getUserLocation();
+      let url;
+      
+      if (location.lat && location.lng) {
+        url = `https://www.google.com/maps?q=${location.lat},${location.lng}`;
+      } else {
+        url = 'https://www.google.com/maps';
+      }
+      
+      window.open(url, '_blank');
+    }
+    
+    // Auto-detect on load
+    document.addEventListener('DOMContentLoaded', detectLocation);
+  </script>
+</body>
+</html>

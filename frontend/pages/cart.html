@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cart - FoodZap</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .cart-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: var(--lg) var(--md);
+    }
+    
+    .cart-header {
+      margin-bottom: var(--lg);
+    }
+    
+    .cart-header h1 {
+      font-size: 1.75rem;
+      margin-bottom: var(--sm);
+    }
+    
+    .cart-content {
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: var(--xl);
+    }
+    
+    @media (max-width: 768px) {
+      .cart-content {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .cart-items-section {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: var(--lg);
+    }
+    
+    .restaurant-info {
+      display: flex;
+      align-items: center;
+      gap: var(--md);
+      padding-bottom: var(--md);
+      border-bottom: 1px solid var(--light-gray);
+      margin-bottom: var(--md);
+    }
+    
+    .restaurant-info img {
+      width: 50px;
+      height: 50px;
+      border-radius: var(--radius-md);
+      object-fit: cover;
+    }
+    
+    .cart-item {
+      display: flex;
+      gap: var(--md);
+      padding: var(--md) 0;
+      border-bottom: 1px solid var(--light-gray);
+    }
+    
+    .cart-item:last-child {
+      border-bottom: none;
+    }
+    
+    .cart-item-image {
+      width: 100px;
+      height: 100px;
+      border-radius: var(--radius-md);
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    
+    .cart-item-details {
+      flex: 1;
+    }
+    
+    .cart-item-name {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: var(--xs);
+    }
+    
+    .cart-item-meta {
+      color: var(--dark-gray);
+      font-size: 0.9rem;
+      margin-bottom: var(--sm);
+    }
+    
+    .cart-item-price {
+      font-weight: 600;
+      color: var(--primary);
+      font-size: 1.1rem;
+    }
+    
+    .quantity-control {
+      display: flex;
+      align-items: center;
+      gap: var(--sm);
+      margin-top: var(--sm);
+    }
+    
+    .qty-btn {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--light-gray);
+      background: white;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .qty-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    
+    .qty-value {
+      min-width: 40px;
+      text-align: center;
+      font-weight: 600;
+    }
+    
+    .remove-btn {
+      color: var(--danger);
+      cursor: pointer;
+      padding: var(--sm);
+      transition: color var(--transition-fast);
+    }
+    
+    .remove-btn:hover {
+      color: var(--danger);
+      opacity: 0.8;
+    }
+    
+    .cart-summary {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: var(--lg);
+      position: sticky;
+      top: 80px;
+      height: fit-content;
+    }
+    
+    .summary-title {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: var(--md);
+      padding-bottom: var(--md);
+      border-bottom: 1px solid var(--light-gray);
+    }
+    
+    .bill-row {
+      display: flex;
+      justify-content: space-between;
+      padding: var(--sm) 0;
+      color: var(--dark-gray);
+    }
+    
+    .bill-row.discount {
+      color: var(--success);
+    }
+    
+    .bill-row.total {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: var(--black);
+      border-top: 1px solid var(--light-gray);
+      margin-top: var(--sm);
+      padding-top: var(--md);
+    }
+    
+    .checkout-btn {
+      width: 100%;
+      margin-top: var(--md);
+      padding: var(--md);
+      font-size: 1.1rem;
+    }
+    
+    .empty-cart {
+      text-align: center;
+      padding: var(--xxl);
+    }
+    
+    .empty-cart-icon {
+      font-size: 5rem;
+      margin-bottom: var(--md);
+    }
+    
+    .empty-cart h2 {
+      margin-bottom: var(--sm);
+      color: var(--dark-gray);
+    }
+    
+    .empty-cart p {
+      color: var(--gray);
+      margin-bottom: var(--lg);
+    }
+    
+    .coupon-section {
+      margin-bottom: var(--md);
+      padding-bottom: var(--md);
+      border-bottom: 1px solid var(--light-gray);
+    }
+    
+    .coupon-input-group {
+      display: flex;
+      gap: var(--sm);
+    }
+    
+    .coupon-input {
+      flex: 1;
+      padding: var(--sm) var(--md);
+      border: 1px solid var(--light-gray);
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+    }
+    
+    .coupon-btn {
+      padding: var(--sm) var(--md);
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-weight: 500;
+    }
+    
+    .applied-coupon {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0, 184, 148, 0.1);
+      padding: var(--sm) var(--md);
+      border-radius: var(--radius-md);
+      margin-top: var(--sm);
+    }
+    
+    .applied-coupon code {
+      color: var(--success);
+      font-weight: 600;
+    }
+    
+    .remove-coupon {
+      color: var(--danger);
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container header-content">
+      <a href="./index.html" class="logo">
+        <span class="logo-icon">🍕</span>
+        <span>FoodZap</span>
+      </a>
+      <div style="width: 100px;"></div>
+    </div>
+  </header>
+
+  <main class="cart-container">
+    <div class="cart-header">
+      <h1>🛒 Shopping Cart</h1>
+      <p id="cartSubtitle">Review your items and proceed to checkout</p>
+    </div>
+
+    <div class="cart-content" id="cartContent">
+      <!-- Cart content loaded dynamically -->
+    </div>
+  </main>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/cart.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    const CartPage = {
+      init() {
+        this.renderCart();
+      },
+      
+      renderCart() {
+        const container = document.getElementById('cartContent');
+        const cart = Utils.getStorage('cart', { items: [], restaurant: null });
+        
+        if (!cart.items || cart.items.length === 0) {
+          container.innerHTML = `
+            <div class="empty-cart" style="grid-column: 1 / -1;">
+              <div class="empty-cart-icon">🛒</div>
+              <h2>Your cart is empty</h2>
+              <p>Looks like you haven't added anything yet!</p>
+              <a href="restaurants.html" class="btn btn-primary btn-lg">Browse Restaurants</a>
+            </div>
+          `;
+          document.getElementById('cartSubtitle').textContent = 'Add items to get started';
+          return;
+        }
+        
+        const totals = this.calculateTotals(cart);
+        
+        container.innerHTML = `
+          <div class="cart-items-section">
+            <div class="restaurant-info">
+              <img src="${cart.restaurant?.image || CONFIG.PLACEHOLDER_IMAGE}" alt="${cart.restaurant?.name}">
+              <div>
+                <div style="font-weight: 600; font-size: 1.1rem;">${cart.restaurant?.name || 'Restaurant'}</div>
+                <div style="color: var(--dark-gray); font-size: 0.9rem;">${cart.items.length} items</div>
+              </div>
+            </div>
+            
+            <div id="cartItemsList">
+              ${cart.items.map(item => this.renderCartItem(item)).join('')}
+            </div>
+          </div>
+          
+          <div class="cart-summary">
+            <div class="summary-title">Order Summary</div>
+            
+            <div class="coupon-section">
+              <div class="coupon-input-group">
+                <input type="text" class="coupon-input" id="couponCode" placeholder="Enter coupon code">
+                <button class="coupon-btn" onclick="CartPage.applyCoupon()">Apply</button>
+              </div>
+              <div id="appliedCoupon"></div>
+            </div>
+            
+            <div class="bill-row">
+              <span>Item Total (${totals.itemCount} items)</span>
+              <span>${Utils.formatPrice(totals.itemsTotal)}</span>
+            </div>
+            <div class="bill-row">
+              <span>Delivery Fee</span>
+              <span>${totals.deliveryFee === 0 ? 'FREE' : Utils.formatPrice(totals.deliveryFee)}</span>
+            </div>
+            <div class="bill-row">
+              <span>Platform Fee</span>
+              <span>${Utils.formatPrice(totals.platformFee)}</span>
+            </div>
+            <div class="bill-row">
+              <span>GST</span>
+              <span>${Utils.formatPrice(totals.gst)}</span>
+            </div>
+            ${totals.discount > 0 ? `
+              <div class="bill-row discount">
+                <span>Discount</span>
+                <span>-${Utils.formatPrice(totals.discount)}</span>
+              </div>
+            ` : ''}
+            <div class="bill-row total">
+              <span>To Pay</span>
+              <span>${Utils.formatPrice(totals.totalAmount)}</span>
+            </div>
+            
+            <a href="checkout.html" class="btn btn-primary checkout-btn">
+              Proceed to Checkout
+            </a>
+          </div>
+        `;
+        
+        document.getElementById('cartSubtitle').textContent = `From ${cart.restaurant?.name || 'Restaurant'}`;
+      },
+      
+      renderCartItem(item) {
+        let price = item.price;
+        if (item.variant?.price) price = item.variant.price;
+        
+        let addonsTotal = 0;
+        if (item.addons) {
+          addonsTotal = item.addons.reduce((sum, a) => sum + (a.price || 0), 0);
+        }
+        
+        const itemTotal = (price + addonsTotal) * item.quantity;
+        
+        return `
+          <div class="cart-item">
+            <img src="${item.image || CONFIG.PLACEHOLDER_IMAGE}" alt="${item.name}" class="cart-item-image">
+            <div class="cart-item-details">
+              <div class="cart-item-name">${item.name}</div>
+              <div class="cart-item-meta">
+                ${item.variant ? item.variant.name : ''}
+                ${item.addons?.length ? `<br>Add-ons: ${item.addons.map(a => a.name).join(', ')}` : ''}
+              </div>
+              <div class="cart-item-price">${Utils.formatPrice(itemTotal)}</div>
+              <div class="quantity-control">
+                <button class="qty-btn" onclick="CartPage.updateQuantity('${item.id}', ${item.quantity - 1})">
+                  <i class="fas fa-minus"></i>
+                </button>
+                <span class="qty-value">${item.quantity}</span>
+                <button class="qty-btn" onclick="CartPage.updateQuantity('${item.id}', ${item.quantity + 1})">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </div>
+            <button class="remove-btn" onclick="CartPage.removeItem('${item.id}')">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        `;
+      },
+      
+      calculateTotals(cart) {
+        let itemsTotal = 0;
+        cart.items.forEach(item => {
+          let price = item.price;
+          if (item.variant?.price) price = item.variant.price;
+          
+          let addonsTotal = 0;
+          if (item.addons) {
+            addonsTotal = item.addons.reduce((sum, a) => sum + (a.price || 0), 0);
+          }
+          
+          itemsTotal += (price + addonsTotal) * item.quantity;
+        });
+        
+        const deliveryFee = itemsTotal > 500 ? 0 : 40;
+        const platformFee = 5;
+        const gst = Math.round(itemsTotal * 0.05);
+        const discount = cart.coupon?.discount || 0;
+        const totalAmount = itemsTotal + deliveryFee + platformFee + gst - discount;
+        
+        return {
+          itemsTotal,
+          itemCount: cart.items.reduce((sum, i) => sum + i.quantity, 0),
+          deliveryFee,
+          platformFee,
+          gst,
+          discount,
+          totalAmount: Math.max(0, totalAmount)
+        };
+      },
+      
+      updateQuantity(itemId, quantity) {
+        if (quantity < 1) {
+          this.removeItem(itemId);
+          return;
+        }
+        
+        const cart = Utils.getStorage('cart', { items: [], restaurant: null });
+        const item = cart.items.find(i => i.id === itemId);
+        
+        if (item) {
+          item.quantity = quantity;
+          Utils.setStorage('cart', cart);
+          this.renderCart();
+          Cart.updateUI();
+        }
+      },
+      
+      removeItem(itemId) {
+        const cart = Utils.getStorage('cart', { items: [], restaurant: null });
+        cart.items = cart.items.filter(i => i.id !== itemId);
+        
+        if (cart.items.length === 0) {
+          cart.restaurant = null;
+        }
+        
+        Utils.setStorage('cart', cart);
+        this.renderCart();
+        Cart.updateUI();
+        Utils.showToast('Item removed from cart', 'success');
+      },
+      
+      applyCoupon() {
+        const code = document.getElementById('couponCode').value.trim();
+        if (!code) {
+          Utils.showToast('Please enter a coupon code', 'warning');
+          return;
+        }
+        
+        // Mock coupon application - in production, validate via API
+        const discounts = { 'FOOD20': 20, 'WELCOME50': 50, 'NEWUSER': 30 };
+        const discount = discounts[code.toUpperCase()];
+        
+        if (discount) {
+          const cart = Utils.getStorage('cart', { items: [], restaurant: null });
+          cart.coupon = { code: code.toUpperCase(), discount };
+          Utils.setStorage('cart', cart);
+          this.renderCart();
+          Utils.showToast(`Coupon applied! You saved ${Utils.formatPrice(discount)}`, 'success');
+        } else {
+          Utils.showToast('Invalid coupon code', 'error');
+        }
+      },
+      
+      removeCoupon() {
+        const cart = Utils.getStorage('cart', { items: [], restaurant: null });
+        delete cart.coupon;
+        Utils.setStorage('cart', cart);
+        this.renderCart();
+        Utils.showToast('Coupon removed', 'success');
+      }
+    };
+    
+    document.addEventListener('DOMContentLoaded', () => CartPage.init());
+  </script>
+</body>
+</html>

@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - FoodZap</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .admin-container {
+      display: flex;
+      min-height: 100vh;
+    }
+    
+    .admin-sidebar {
+      width: 250px;
+      background: #1a1a2e;
+      color: white;
+      padding: var(--lg);
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    
+    .admin-sidebar h2 {
+      font-size: 1.5rem;
+      margin-bottom: var(--lg);
+      color: var(--primary);
+    }
+    
+    .admin-nav-item {
+      display: block;
+      padding: var(--md);
+      color: white;
+      text-decoration: none;
+      border-radius: var(--radius-md);
+      margin-bottom: var(--xs);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .admin-nav-item:hover, .admin-nav-item.active {
+      background: var(--primary);
+    }
+    
+    .admin-nav-item i {
+      width: 25px;
+    }
+    
+    .admin-content {
+      flex: 1;
+      margin-left: 250px;
+      padding: var(--xl);
+      background: var(--lighter-gray);
+    }
+    
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--xl);
+    }
+    
+    .admin-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--lg);
+      margin-bottom: var(--xl);
+    }
+    
+    .stat-card {
+      background: white;
+      padding: var(--lg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .stat-card h3 {
+      color: var(--gray);
+      font-size: 0.9rem;
+      margin-bottom: var(--sm);
+    }
+    
+    .stat-card .value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--dark);
+    }
+    
+    .stat-card .trend {
+      font-size: 0.9rem;
+      margin-top: var(--xs);
+    }
+    
+    .stat-card .trend.positive {
+      color: #00b894;
+    }
+    
+    .stat-card .trend.negative {
+      color: var(--danger);
+    }
+    
+    .admin-section {
+      background: white;
+      padding: var(--xl);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: var(--xl);
+    }
+    
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--lg);
+    }
+    
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .data-table th, .data-table td {
+      padding: var(--md);
+      text-align: left;
+      border-bottom: 1px solid var(--light-gray);
+    }
+    
+    .data-table th {
+      background: var(--lighter-gray);
+      font-weight: 600;
+    }
+    
+    .data-table tr:hover {
+      background: var(--lighter-gray);
+    }
+    
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    
+    .status-badge.active {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .status-badge.inactive {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    .action-btn {
+      padding: 6px 12px;
+      border-radius: var(--radius-md);
+      border: none;
+      cursor: pointer;
+      font-size: 0.85rem;
+      margin-right: var(--xs);
+    }
+    
+    .action-btn.edit {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .action-btn.delete {
+      background: var(--danger);
+      color: white;
+    }
+    
+    .admin-panel {
+      display: none;
+    }
+    
+    .admin-panel.active {
+      display: block;
+    }
+    
+    .form-group {
+      margin-bottom: var(--md);
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: var(--xs);
+      font-weight: 500;
+    }
+    
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: var(--sm) var(--md);
+      border: 2px solid var(--light-gray);
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+    }
+    
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    
+    .btn-group {
+      display: flex;
+      gap: var(--sm);
+      margin-top: var(--lg);
+    }
+    
+    @media (max-width: 768px) {
+      .admin-sidebar {
+        width: 70px;
+        padding: var(--md);
+      }
+      
+      .admin-sidebar h2 {
+        font-size: 1rem;
+      }
+      
+      .admin-nav-item span {
+        display: none;
+      }
+      
+      .admin-content {
+        margin-left: 70px;
+        padding: var(--md);
+      }
+      
+      .admin-stats {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-container">
+    <aside class="admin-sidebar">
+      <h2>🍕 FoodZap</h2>
+      <nav>
+        <a class="admin-nav-item active" onclick="showPanel('dashboard')">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Dashboard</span>
+        </a>
+        <a class="admin-nav-item" onclick="showPanel('restaurants')">
+          <i class="fas fa-utensils"></i>
+          <span>Restaurants</span>
+        </a>
+        <a class="admin-nav-item" onclick="showPanel('orders')">
+          <i class="fas fa-clipboard-list"></i>
+          <span>Orders</span>
+        </a>
+        <a class="admin-nav-item" onclick="showPanel('users')">
+          <i class="fas fa-users"></i>
+          <span>Users</span>
+        </a>
+        <a class="admin-nav-item" onclick="showPanel('menu')">
+          <i class="fas fa-hamburger"></i>
+          <span>Menu Items</span>
+        </a>
+        <a class="admin-nav-item" href="./index.html" style="margin-top: var(--xl);">
+          <i class="fas fa-arrow-left"></i>
+          <span>Back to Site</span>
+        </a>
+      </nav>
+    </aside>
+    
+    <main class="admin-content">
+      <!-- Dashboard Panel -->
+      <div id="dashboard" class="admin-panel active">
+        <div class="admin-header">
+          <h1>Dashboard</h1>
+          <p>Welcome back, Admin!</p>
+        </div>
+        
+        <div class="admin-stats">
+          <div class="stat-card">
+            <h3>Total Restaurants</h3>
+            <div class="value">8</div>
+            <div class="trend positive"><i class="fas fa-arrow-up"></i> 12% from last month</div>
+          </div>
+          <div class="stat-card">
+            <h3>Total Orders</h3>
+            <div class="value">156</div>
+            <div class="trend positive"><i class="fas fa-arrow-up"></i> 23% from last month</div>
+          </div>
+          <div class="stat-card">
+            <h3>Total Revenue</h3>
+            <div class="value">₹45,678</div>
+            <div class="trend positive"><i class="fas fa-arrow-up"></i> 18% from last month</div>
+          </div>
+          <div class="stat-card">
+            <h3>Active Users</h3>
+            <div class="value">89</div>
+            <div class="trend positive"><i class="fas fa-arrow-up"></i> 5% from last month</div>
+          </div>
+        </div>
+        
+        <div class="admin-section">
+          <div class="section-header">
+            <h2>Recent Orders</h2>
+            <button class="btn btn-primary btn-sm">View All</button>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Restaurant</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>#ORD001</td>
+                <td>John Doe</td>
+                <td>Pizza Hut</td>
+                <td>₹599</td>
+                <td><span class="status-badge active">Delivered</span></td>
+                <td>
+                  <button class="action-btn edit"><i class="fas fa-eye"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td>#ORD002</td>
+                <td>Jane Smith</td>
+                <td>Burger King</td>
+                <td>₹349</td>
+                <td><span class="status-badge active">Out for Delivery</span></td>
+                <td>
+                  <button class="action-btn edit"><i class="fas fa-eye"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td>#ORD003</td>
+                <td>Mike Johnson</td>
+                <td>Biryani House</td>
+                <td>₹699</td>
+                <td><span class="status-badge inactive">Pending</span></td>
+                <td>
+                  <button class="action-btn edit"><i class="fas fa-eye"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Restaurants Panel -->
+      <div id="restaurants" class="admin-panel">
+        <div class="admin-header">
+          <h1>Restaurants</h1>
+          <button class="btn btn-primary" onclick="showAddRestaurantModal()">+ Add Restaurant</button>
+        </div>
+        
+        <div class="admin-section">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Cuisine</th>
+                <th>Rating</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="restaurantsTableBody">
+              <!-- Loaded dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Orders Panel -->
+      <div id="orders" class="admin-panel">
+        <div class="admin-header">
+          <h1>Orders</h1>
+          <div class="btn-group">
+            <button class="btn btn-primary btn-sm">Export CSV</button>
+          </div>
+        </div>
+        
+        <div class="admin-section">
+          <div style="margin-bottom: var(--md);">
+            <input type="text" class="form-input" placeholder="Search orders..." style="max-width: 300px;">
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Restaurant</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTableBody">
+              <!-- Loaded dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Users Panel -->
+      <div id="users" class="admin-panel">
+        <div class="admin-header">
+          <h1>Users</h1>
+        </div>
+        
+        <div class="admin-section">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>Admin User</td>
+                <td>admin@foodzap.com</td>
+                <td>Admin</td>
+                <td><span class="status-badge active">Active</span></td>
+                <td>
+                  <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Menu Panel -->
+      <div id="menu" class="admin-panel">
+        <div class="admin-header">
+          <h1>Menu Items</h1>
+          <button class="btn btn-primary">+ Add Item</button>
+        </div>
+        
+        <div class="admin-section">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Restaurant</th>
+                <th>Price</th>
+                <th>Available</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>Margherita Pizza</td>
+                <td>Pizza Hut</td>
+                <td>₹299</td>
+                <td><span class="status-badge active">Yes</span></td>
+                <td>
+                  <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                  <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <!-- Add Restaurant Modal -->
+  <div id="addRestaurantModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: white; padding: var(--xl); border-radius: var(--radius-lg); max-width: 500px; width: 90%;">
+      <h2 style="margin-bottom: var(--lg);">Add New Restaurant</h2>
+      <form id="addRestaurantForm">
+        <div class="form-group">
+          <label class="form-label">Restaurant Name</label>
+          <input type="text" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea" required></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cuisine Type</label>
+          <select class="form-select" required>
+            <option value="">Select cuisine</option>
+            <option value="Italian">Italian</option>
+            <option value="Indian">Indian</option>
+            <option value="Chinese">Chinese</option>
+            <option value="American">American</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Address</label>
+          <input type="text" class="form-input" required>
+        </div>
+        <div class="btn-group">
+          <button type="submit" class="btn btn-primary">Add Restaurant</button>
+          <button type="button" class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script>
+    function showPanel(panelId) {
+      document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.admin-nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById(panelId).classList.add('active');
+      event.target.closest('.admin-nav-item').classList.add('active');
+      
+      if (panelId === 'restaurants') loadRestaurants();
+      if (panelId === 'orders') loadOrders();
+    }
+    
+    async function loadRestaurants() {
+      try {
+        const response = await fetch(`${CONFIG.API_BASE_URL}/api/restaurants`);
+        const data = await response.json();
+        
+        const tbody = document.getElementById('restaurantsTableBody');
+        if (data.success && data.data) {
+          tbody.innerHTML = data.data.map(r => `
+            <tr>
+              <td>${r.id}</td>
+              <td>${r.name}</td>
+              <td>${Array.isArray(r.cuisine) ? r.cuisine.join(', ') : r.cuisine || '-'}</td>
+              <td>⭐ ${r.rating || 0}</td>
+              <td><span class="status-badge ${r.isActive ? 'active' : 'inactive'}">${r.isActive ? 'Active' : 'Inactive'}</span></td>
+              <td>
+                <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+              </td>
+            </tr>
+          `).join('');
+        }
+      } catch (error) {
+        console.error('Error loading restaurants:', error);
+      }
+    }
+    
+    async function loadOrders() {
+      try {
+        const tbody = document.getElementById('ordersTableBody');
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Loading orders...</td></tr>';
+        
+        // Sample data for now
+        tbody.innerHTML = `
+          <tr>
+            <td>#ORD001</td>
+            <td>John Doe</td>
+            <td>Pizza Hut</td>
+            <td>₹599</td>
+            <td><span class="status-badge active">Delivered</span></td>
+            <td>
+              <button class="action-btn edit"><i class="fas fa-eye"></i></button>
+            </td>
+          </tr>
+        `;
+      } catch (error) {
+        console.error('Error loading orders:', error);
+      }
+    }
+    
+    function showAddRestaurantModal() {
+      document.getElementById('addRestaurantModal').style.display = 'flex';
+    }
+    
+    function closeModal() {
+      document.getElementById('addRestaurantModal').style.display = 'none';
+    }
+    
+    document.getElementById('addRestaurantForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert('Restaurant added successfully!');
+      closeModal();
+    });
+    
+    // Load restaurants on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadRestaurants();
+    });
+  </script>
+</body>
+</html>

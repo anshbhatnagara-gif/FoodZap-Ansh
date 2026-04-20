@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile - FoodZap</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .profile-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: var(--lg) var(--md);
+    }
+    
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: var(--lg);
+      margin-bottom: var(--xl);
+    }
+    
+    .profile-avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: var(--radius-full);
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2.5rem;
+      position: relative;
+    }
+    
+    .avatar-edit {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 32px;
+      height: 32px;
+      background: white;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .profile-info h2 {
+      margin-bottom: var(--xs);
+    }
+    
+    .profile-section {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: var(--lg);
+      margin-bottom: var(--md);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: var(--md);
+      display: flex;
+      align-items: center;
+      gap: var(--sm);
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--md);
+    }
+    
+    .preference-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sm);
+      padding: var(--sm) var(--md);
+      background: var(--lighter-gray);
+      border-radius: var(--radius-full);
+      margin: var(--xs);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .preference-chip:hover,
+    .preference-chip.active {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .order-card {
+      display: flex;
+      gap: var(--md);
+      padding: var(--md);
+      border: 1px solid var(--light-gray);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--sm);
+    }
+    
+    .order-img {
+      width: 80px;
+      height: 80px;
+      border-radius: var(--radius-md);
+      object-fit: cover;
+    }
+    
+    .order-details {
+      flex: 1;
+    }
+    
+    .order-meta {
+      display: flex;
+      gap: var(--md);
+      margin-top: var(--sm);
+      font-size: 0.85rem;
+      color: var(--dark-gray);
+    }
+    
+    @media (max-width: 600px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      
+      .profile-header {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container header-content">
+      <a href="./index.html" class="logo">
+        <span class="logo-icon">🍕</span>
+        <span>FoodZap</span>
+      </a>
+      <div></div>
+      <div class="header-actions">
+        <button class="btn btn-ghost" onclick="App.logout()">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="profile-container">
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <div class="profile-avatar" id="profileAvatar">
+        <img id="avatarImg" src="" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: none;">
+        <i class="fas fa-user" id="avatarIcon"></i>
+        <div class="avatar-edit" onclick="ProfilePage.triggerImageUpload()">
+          <i class="fas fa-camera"></i>
+        </div>
+        <input type="file" id="avatarInput" accept="image/*" style="display: none;" onchange="ProfilePage.handleImageUpload(this)">
+      </div>
+      <div class="profile-info">
+        <h2 id="userName">Loading...</h2>
+        <p id="userEmail" style="color: var(--dark-gray);">--</p>
+        <p id="userPhone" style="color: var(--dark-gray);">--</p>
+      </div>
+    </div>
+
+    <!-- Personal Information -->
+    <div class="profile-section">
+      <div class="section-title">
+        <i class="fas fa-user-circle text-primary"></i>
+        Personal Information
+      </div>
+      <form id="profileForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-input" id="editName" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" id="editEmail" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            <input type="tel" class="form-input" id="editPhone" maxlength="10">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Date of Birth</label>
+            <input type="date" class="form-input" id="editDob">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Gender</label>
+          <select class="form-select form-input" id="editGender">
+            <option value="">Select Gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top: var(--md);">
+          <i class="fas fa-save"></i> Save Changes
+        </button>
+      </form>
+    </div>
+
+    <!-- Food Preferences -->
+    <div class="profile-section">
+      <div class="section-title">
+        <i class="fas fa-utensils text-primary"></i>
+        Food Preferences
+      </div>
+      <div class="form-group">
+        <label class="form-label">Dietary Preference</label>
+        <div id="dietaryPrefs">
+          <span class="preference-chip ${user?.dietaryPreferences?.isVeg ? 'active' : ''}" data-pref="veg">
+            <i class="fas fa-leaf"></i> Vegetarian
+          </span>
+          <span class="preference-chip" data-pref="vegan">
+            <i class="fas fa-seedling"></i> Vegan
+          </span>
+          <span class="preference-chip" data-pref="non-veg">
+            <i class="fas fa-drumstick-bite"></i> Non-Veg
+          </span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Spice Level</label>
+        <select class="form-select form-input" id="spiceLevel">
+          <option value="mild">Mild</option>
+          <option value="medium" selected>Medium</option>
+          <option value="hot">Hot</option>
+          <option value="extra-hot">Extra Hot</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Favorite Cuisines</label>
+        <div id="cuisinePrefs">
+          <span class="preference-chip" data-cuisine="North Indian">North Indian</span>
+          <span class="preference-chip" data-cuisine="South Indian">South Indian</span>
+          <span class="preference-chip" data-cuisine="Chinese">Chinese</span>
+          <span class="preference-chip" data-cuisine="Italian">Italian</span>
+          <span class="preference-chip" data-cuisine="Mexican">Mexican</span>
+          <span class="preference-chip" data-cuisine="Thai">Thai</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="profile-section">
+      <div class="section-title">
+        <i class="fas fa-box text-primary"></i>
+        Recent Orders
+        <a href="orders.html" style="margin-left: auto; font-size: 0.9rem; color: var(--primary);">View All</a>
+      </div>
+      <div id="recentOrders">
+        <p style="text-align: center; color: var(--dark-gray); padding: var(--lg);">Loading orders...</p>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="profile-section">
+      <div class="section-title">
+        <i class="fas fa-cog text-primary"></i>
+        Quick Actions
+      </div>
+      <div class="grid grid-2" style="gap: var(--md);">
+        <a href="addresses.html" class="btn btn-ghost" style="justify-content: flex-start;">
+          <i class="fas fa-map-marker-alt"></i> Manage Addresses
+        </a>
+        <a href="favorites.html" class="btn btn-ghost" style="justify-content: flex-start;">
+          <i class="fas fa-heart"></i> Favorites
+        </a>
+        <a href="payment-methods.html" class="btn btn-ghost" style="justify-content: flex-start;">
+          <i class="fas fa-credit-card"></i> Payment Methods
+        </a>
+        <a href="notifications.html" class="btn btn-ghost" style="justify-content: flex-start;">
+          <i class="fas fa-bell"></i> Notifications
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/cart.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    const ProfilePage = {
+      user: null,
+      
+      init() {
+        if (!App.requireAuth()) return;
+        this.loadProfile();
+        this.setupEventListeners();
+      },
+      
+      async loadProfile() {
+        try {
+          const result = await API.user.getProfile();
+          if (result.success) {
+            this.user = result.data;
+            this.renderProfile(result.data);
+            this.loadRecentOrders();
+          }
+        } catch (error) {
+          Utils.showToast('Failed to load profile', 'error');
+        }
+      },
+      
+      renderProfile(user) {
+        document.getElementById('userName').textContent = user.name || 'User';
+        document.getElementById('userEmail').textContent = user.email || 'No email';
+        document.getElementById('userPhone').textContent = user.phone || 'No phone';
+        
+        // Update avatar
+        if (user.avatar) {
+          document.getElementById('avatarImg').src = user.avatar;
+          document.getElementById('avatarImg').style.display = 'block';
+          document.getElementById('avatarIcon').style.display = 'none';
+        }
+        
+        document.getElementById('editName').value = user.name || '';
+        document.getElementById('editEmail').value = user.email || '';
+        document.getElementById('editPhone').value = user.phone || '';
+        document.getElementById('editDob').value = user.dateOfBirth ? user.dateOfBirth.split('T')[0] : '';
+        document.getElementById('editGender').value = user.gender || '';
+        
+        // Set preferences
+        if (user.dietaryPreferences) {
+          document.getElementById('spiceLevel').value = user.dietaryPreferences.spiceLevel || 'medium';
+          
+          // Update preference chips
+          if (user.dietaryPreferences.isVeg) {
+            document.querySelector('[data-pref="veg"]').classList.add('active');
+          }
+          if (user.dietaryPreferences.isVegan) {
+            document.querySelector('[data-pref="vegan"]').classList.add('active');
+          }
+          
+          user.dietaryPreferences.cuisines?.forEach(cuisine => {
+            document.querySelector(`[data-cuisine="${cuisine}"]`)?.classList.add('active');
+          });
+        }
+      },
+      
+      // Image Upload Methods
+      triggerImageUpload() {
+        document.getElementById('avatarInput').click();
+      },
+      
+      async handleImageUpload(input) {
+        const file = input.files[0];
+        if (!file) return;
+        
+        // Validate file
+        if (!file.type.startsWith('image/')) {
+          Utils.showToast('Please select an image file', 'error');
+          return;
+        }
+        
+        if (file.size > 5 * 1024 * 1024) {
+          Utils.showToast('Image size should be less than 5MB', 'error');
+          return;
+        }
+        
+        // Show loading
+        Utils.showToast('Uploading image...', 'info');
+        
+        try {
+          const formData = new FormData();
+          formData.append('profileImage', file);
+          
+          // Upload to backend (Cloudinary)
+          const response = await fetch(`${CONFIG.API_BASE_URL}/users/upload-avatar`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${API.auth.getToken()}`
+            },
+            body: formData
+          });
+          
+          const data = await response.json();
+          
+          if (data.success) {
+            // Update avatar display
+            document.getElementById('avatarImg').src = data.avatarUrl;
+            document.getElementById('avatarImg').style.display = 'block';
+            document.getElementById('avatarIcon').style.display = 'none';
+            Utils.showToast('Profile photo updated!', 'success');
+          } else {
+            Utils.showToast(data.message || 'Upload failed', 'error');
+          }
+        } catch (error) {
+          console.error('Upload error:', error);
+          Utils.showToast('Failed to upload image', 'error');
+        }
+      },
+      
+      async loadRecentOrders() {
+        try {
+          const result = await API.user.getOrders();
+          if (result.success && result.data.length > 0) {
+            const container = document.getElementById('recentOrders');
+            container.innerHTML = result.data.slice(0, 3).map(order => `
+              <div class="order-card">
+                <img src="${order.restaurant?.images?.logo || CONFIG.PLACEHOLDER_IMAGE}" 
+                     alt="${order.restaurant?.name}" class="order-img">
+                <div class="order-details">
+                  <div style="font-weight: 600;">${order.restaurant?.name}</div>
+                  <div style="font-size: 0.9rem; color: var(--dark-gray);">
+                    ${order.items.length} items • ${Utils.formatPrice(order.pricing?.totalAmount)}
+                  </div>
+                  <div class="order-meta">
+                    <span class="badge badge-${order.status === 'delivered' ? 'success' : 'warning'}">
+                      ${CONFIG.ORDER_STATUS[order.status]?.label || order.status}
+                    </span>
+                    <span>${Utils.formatRelativeTime(order.createdAt)}</span>
+                  </div>
+                </div>
+                <a href="order-tracking.html?orderId=${order.orderId}" class="btn btn-ghost">
+                  <i class="fas fa-chevron-right"></i>
+                </a>
+              </div>
+            `).join('');
+          } else {
+            document.getElementById('recentOrders').innerHTML = `
+              <p style="text-align: center; color: var(--dark-gray); padding: var(--lg);">
+                No orders yet. <a href="./index.html" style="color: var(--primary);">Order now!</a>
+              </p>
+            `;
+          }
+        } catch (error) {
+          console.error('Failed to load orders', error);
+        }
+      },
+      
+      setupEventListeners() {
+        // Profile form
+        document.getElementById('profileForm')?.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          
+          const data = {
+            name: document.getElementById('editName').value,
+            email: document.getElementById('editEmail').value,
+            phone: document.getElementById('editPhone').value,
+            dateOfBirth: document.getElementById('editDob').value,
+            gender: document.getElementById('editGender').value
+          };
+          
+          try {
+            const result = await API.user.updateProfile(data);
+            if (result.success) {
+              Utils.showToast('Profile updated successfully', 'success');
+              this.loadProfile();
+            }
+          } catch (error) {
+            Utils.showToast(error.message || 'Failed to update profile', 'error');
+          }
+        });
+        
+        // Preference chips
+        document.querySelectorAll('.preference-chip').forEach(chip => {
+          chip.addEventListener('click', () => {
+            chip.classList.toggle('active');
+            this.savePreferences();
+          });
+        });
+        
+        // Spice level
+        document.getElementById('spiceLevel')?.addEventListener('change', () => {
+          this.savePreferences();
+        });
+      },
+      
+      async savePreferences() {
+        const preferences = {
+          isVeg: document.querySelector('[data-pref="veg"]')?.classList.contains('active') || false,
+          isVegan: document.querySelector('[data-pref="vegan"]')?.classList.contains('active') || false,
+          spiceLevel: document.getElementById('spiceLevel')?.value || 'medium',
+          cuisines: Array.from(document.querySelectorAll('[data-cuisine].active')).map(c => c.dataset.cuisine)
+        };
+        
+        try {
+          await API.user.updatePreferences(preferences);
+        } catch (error) {
+          console.error('Failed to save preferences', error);
+        }
+      }
+    };
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      ProfilePage.init();
+    });
+  </script>
+</body>
+</html>

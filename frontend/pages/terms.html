@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms & Conditions - FoodZap</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .legal-container {
+      max-width: 900px;
+      margin: 100px auto 40px;
+      padding: var(--lg);
+    }
+    
+    .legal-content {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: var(--xl);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .legal-content h2 {
+      color: var(--primary);
+      margin-top: var(--lg);
+      margin-bottom: var(--md);
+      font-size: 1.3rem;
+    }
+    
+    .legal-content h3 {
+      margin-top: var(--md);
+      margin-bottom: var(--sm);
+      font-size: 1.1rem;
+    }
+    
+    .legal-content p {
+      line-height: 1.8;
+      margin-bottom: var(--md);
+      color: var(--gray);
+    }
+    
+    .legal-content ul {
+      padding-left: var(--lg);
+      margin-bottom: var(--md);
+    }
+    
+    .legal-content li {
+      line-height: 1.8;
+      margin-bottom: var(--xs);
+      color: var(--gray);
+    }
+    
+    .last-updated {
+      background: var(--lighter-gray);
+      padding: var(--md);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--lg);
+      text-align: center;
+      color: var(--gray);
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container header-content">
+      <a href="./index.html" class="logo">
+        <span class="logo-icon">🍕</span>
+        <span>FoodZap</span>
+      </a>
+      <nav class="nav-links">
+        <a href="./index.html">Home</a>
+        <a href="./restaurants.html">Restaurants</a>
+        <a href="./instamart.html">Instamart</a>
+        <a href="./offers.html">Offers</a>
+      </nav>
+      <div class="header-actions">
+        <button class="btn btn-ghost" id="cartBtn">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="badge badge-primary" id="cartCount" style="display: none;">0</span>
+        </button>
+        <div id="authButtons">
+          <a href="./login.html" class="btn btn-ghost btn-sm">Login</a>
+          <a href="./signup.html" class="btn btn-primary btn-sm">Sign Up</a>
+        </div>
+        <div id="userMenu" style="display: none; position: relative;">
+          <button class="btn btn-ghost" id="userDropdownBtn" onclick="toggleUserDropdown()">
+            <i class="fas fa-user"></i>
+          </button>
+          <div id="userDropdown" style="display: none; position: absolute; right: 0; top: 100%; background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); min-width: 180px; z-index: 100; margin-top: var(--sm);">
+            <a href="./profile.html" style="display: block; padding: var(--sm) var(--md); color: var(--dark); text-decoration: none; border-bottom: 1px solid var(--light-gray);">
+              <i class="fas fa-user-circle" style="width: 20px;"></i> My Profile
+            </a>
+            <a href="./orders.html" style="display: block; padding: var(--sm) var(--md); color: var(--dark); text-decoration: none; border-bottom: 1px solid var(--light-gray);">
+              <i class="fas fa-clipboard-list" style="width: 20px;"></i> My Orders
+            </a>
+            <a href="#" onclick="App.logout(); return false;" style="display: block; padding: var(--sm) var(--md); color: var(--danger); text-decoration: none;">
+              <i class="fas fa-sign-out-alt" style="width: 20px;"></i> Logout
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="legal-container">
+    <h1 style="text-align: center; margin-bottom: var(--md);">
+      <i class="fas fa-file-contract" style="color: var(--primary);"></i> Terms & Conditions
+    </h1>
+    
+    <div class="last-updated">
+      <i class="fas fa-calendar-alt"></i> Last Updated: April 20, 2024
+    </div>
+    
+    <div class="legal-content">
+      <h2>1. Introduction</h2>
+      <p>Welcome to FoodZap! These Terms and Conditions govern your use of our website and mobile application. By accessing or using FoodZap, you agree to be bound by these Terms. Please read them carefully.</p>
+      
+      <h2>2. Definitions</h2>
+      <ul>
+        <li><strong>"Service"</strong> refers to the FoodZap platform and all related services.</li>
+        <li><strong>"User"</strong> refers to any person who accesses or uses our Service.</li>
+        <li><strong>"Restaurant Partner"</strong> refers to restaurants and food vendors listed on our platform.</li>
+        <li><strong>"Delivery Partner"</strong> refers to individuals or entities that deliver orders.</li>
+      </ul>
+      
+      <h2>3. User Accounts</h2>
+      <h3>3.1 Registration</h3>
+      <p>To use certain features of the Service, you must register for an account. You agree to provide accurate, current, and complete information during registration.</p>
+      
+      <h3>3.2 Account Security</h3>
+      <p>You are responsible for maintaining the confidentiality of your account credentials and for all activities under your account.</p>
+      
+      <h2>4. Ordering and Delivery</h2>
+      <h3>4.1 Placing Orders</h3>
+      <p>When you place an order through FoodZap, you are entering into a contract with the Restaurant Partner. FoodZap acts as an intermediary platform.</p>
+      
+      <h3>4.2 Pricing and Payment</h3>
+      <ul>
+        <li>All prices are listed in Indian Rupees (INR) and include applicable taxes.</li>
+        <li>Delivery fees, packaging charges, and other applicable fees are shown at checkout.</li>
+        <li>Payment must be made through available payment methods on the platform.</li>
+      </ul>
+      
+      <h3>4.3 Delivery</h3>
+      <p>Delivery times are estimates and may vary based on factors including traffic, weather, and restaurant preparation time.</p>
+      
+      <h2>5. Cancellation and Refunds</h2>
+      <h3>5.1 Order Cancellation</h3>
+      <p>Orders can be cancelled within 5 minutes of placing or before the restaurant confirms the order. Once confirmed, cancellation is at the restaurant's discretion.</p>
+      
+      <h3>5.2 Refunds</h3>
+      <p>Refunds are processed based on our Refund Policy. Please refer to the specific refund terms for different scenarios.</p>
+      
+      <h2>6. User Conduct</h2>
+      <p>You agree not to:</p>
+      <ul>
+        <li>Use the Service for any illegal purpose</li>
+        <li>Harass, abuse, or harm other users</li>
+        <li>Provide false information</li>
+        <li>Interfere with the Service's operation</li>
+        <li>Attempt to gain unauthorized access</li>
+      </ul>
+      
+      <h2>7. Intellectual Property</h2>
+      <p>All content on FoodZap, including logos, text, graphics, and software, is the property of FoodZap or its licensors and is protected by intellectual property laws.</p>
+      
+      <h2>8. Limitation of Liability</h2>
+      <p>FoodZap is not liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the Service.</p>
+      
+      <h2>9. Changes to Terms</h2>
+      <p>We may modify these Terms at any time. We will notify users of significant changes through the Service or email.</p>
+      
+      <h2>10. Contact Us</h2>
+      <p>If you have questions about these Terms, please contact us at:</p>
+      <ul>
+        <li>Email: support@foodzap.com</li>
+        <li>Phone: +91 1800-123-4567</li>
+        <li>Address: FoodZap Technologies Pvt Ltd, Mumbai, India</li>
+      </ul>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--lg); margin-bottom: var(--lg);">
+        <div>
+          <h4 style="color: white; margin-bottom: var(--sm);">FoodZap</h4>
+          <p style="color: var(--gray); font-size: 0.9rem;">Delicious food delivered to your doorstep. Order from the best restaurants in your city.</p>
+        </div>
+        <div>
+          <h4 style="margin-bottom: var(--md);">Quick Links</h4>
+          <ul style="list-style: none; line-height: 2;">
+            <li><a href="./about.html" style="color: var(--gray);">About Us</a></li>
+            <li><a href="./contact.html" style="color: var(--gray);">Contact</a></li>
+            <li><a href="./careers.html" style="color: var(--gray);">Careers</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="margin-bottom: var(--md);">Legal</h4>
+          <ul style="list-style: none; line-height: 2;">
+            <li><a href="./terms.html" style="color: var(--gray);">Terms & Conditions</a></li>
+            <li><a href="./privacy.html" style="color: var(--gray);">Privacy Policy</a></li>
+            <li><a href="./refund.html" style="color: var(--gray);">Refund Policy</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="margin-bottom: var(--md);">Account</h4>
+          <ul style="list-style: none; line-height: 2;">
+            <li><a href="./profile.html" style="color: var(--gray);">My Profile</a></li>
+            <li><a href="./orders.html" style="color: var(--gray);">My Orders</a></li>
+            <li><a href="./chat.html" style="color: var(--gray);">Help Center</a></li>
+          </ul>
+        </div>
+      </div>
+      <div style="text-align: center; padding-top: var(--lg); border-top: 1px solid var(--dark-gray);">
+        <p style="color: var(--gray); font-size: 0.9rem;">&copy; 2024 FoodZap. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Cart Sidebar -->
+  <div class="overlay" id="overlay"></div>
+  <div class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+      <h3><i class="fas fa-shopping-cart"></i> Your Cart</h3>
+      <button class="btn btn-ghost" id="closeCart">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="cart-body" id="cartBody"></div>
+    <div class="cart-footer" id="cartFooter" style="display: none;">
+      <a href="./checkout.html" class="btn btn-primary btn-full btn-lg">Checkout</a>
+    </div>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/cart.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    function toggleUserDropdown() {
+      const dropdown = document.getElementById('userDropdown');
+      if (dropdown) {
+        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+      }
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      Cart.init();
+    });
+  </script>
+</body>
+</html>
