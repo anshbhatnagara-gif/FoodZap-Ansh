@@ -6,10 +6,10 @@
 const express = require('express');
 const router = express.Router();
 const loyaltyController = require('../controllers/loyalty.controller');
-const { protect } = require('../middleware/auth.middleware');
+const { authenticate } = require('../middleware/auth.middleware');
 
 // All routes require authentication
-router.use(protect);
+router.use(authenticate);
 
 // Get user's loyalty points and stats
 router.get('/points', loyaltyController.getMyPoints);

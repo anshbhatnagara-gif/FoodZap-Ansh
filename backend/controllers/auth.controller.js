@@ -79,10 +79,16 @@ exports.login = async (req, res, next) => {
       });
     }
 
-    const { email, password } = req.body;
+    const { email, phone, password } = req.body;
 
-    // Check if user exists
-    const user = await User.findByEmail(email);
+    // Check if user exists (by email or phone)
+    let user = null;
+    if (email) {
+      user = await User.findByEmail(email);
+    } else if (phone) {
+      user = await User.findByPhone(phone);
+    }
+
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -153,7 +159,7 @@ exports.googleAuth = async (req, res, next) => {
         name,
         email,
         googleId,
-        isEmailVerified: true
+        isVerified: true
       });
     } else if (!user.googleId) {
       // Link Google account to existing user

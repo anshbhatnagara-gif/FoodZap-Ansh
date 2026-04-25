@@ -9,17 +9,20 @@ const bcrypt = require('bcryptjs');
 class UserModel {
   // Create new user
   static async create(userData) {
-    const { name, email, phone, password, role = 'customer', avatar = null } = userData;
+    const { name, email, phone, password, role = 'customer', avatar = null, googleId = null, isVerified = false } = userData;
     
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    // Hash password (if provided, otherwise null for Google users)
+    let hashedPassword = null;
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      hashedPassword = await bcrypt.hash(password, salt);
+    }
     
-    const sql = `INSERT INTO users (name, email, phone, password, role, avatar) 
-                 VALUES (?, ?, ?, ?, ?, ?)`;
-    const result = await db.query(sql, [name, email, phone, hashedPassword, role, avatar]);
+    const sql = `INSERT INTO users (name, email, phone, password, role, avatar, googleId, isVerified) 
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+    const result = await db.query(sql, [name, email, phone || null, hashedPassword, role, avatar, googleId, isVerified]);
     
-    return { id: result.insertId, name, email, phone, role, avatar };
+    return { id: result.insertId, name, email, phone, role, avatar, googleId, isVerified };
   }
 
   // Find user by ID
@@ -37,17 +40,23 @@ class UserModel {
     return users[0] || null;
   }
 
+  // Find user by phone (with password for login)
+  static async findByPhone(phone) {
+    const sql = `SELECT * FROM users WHERE phone = ?`;
+    const users = await db.query(sql, [phone]);
+    return users[0] || null;
+  }
+
   // Find user by Google ID
   static async findByGoogleId(googleId) {
-    // Store googleId in a separate table or as JSON - simplified here
-    const sql = `SELECT * FROM users WHERE email LIKE ?`;
-    const users = await db.query(sql, [`%${googleId}%`]);
+    const sql = `SELECT * FROM users WHERE googleId = ?`;
+    const users = await db.query(sql, [googleId]);
     return users[0] || null;
   }
 
   // Update user
   static async update(id, updateData) {
-    const allowedFields = ['name', 'phone', 'avatar', 'role', 'isActive', 'isVerified'];
+    const allowedFields = ['name', 'phone', 'avatar', 'role', 'isActive', 'isVerified', 'googleId', 'lastLogin'];
     const updates = [];
     const values = [];
     
@@ -65,6 +74,11 @@ class UserModel {
     await db.query(sql, values);
     
     return this.findById(id);
+  }
+
+  // Alias for update (for compatibility)
+  static async updateById(id, updateData) {
+    return this.update(id, updateData);
   }
 
   // Delete user
@@ -90,8 +104,8 @@ class UserModel {
   }
 
   // Compare password
-  static async comparePassword(hashedPassword, candidatePassword) {
-    return await bcrypt.compare(candidatePassword, hashedPassword);
+  static async comparePassword(plainPassword, hashedPassword) {
+    return await bcrypt.compare(plainPassword, hashedPassword);
   }
 
   // Get user addresses

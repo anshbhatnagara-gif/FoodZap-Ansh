@@ -15,22 +15,30 @@ const registerValidation = [
     .isLength({ min: 2, max: 50 })
     .withMessage('Name must be between 2 and 50 characters'),
   body('email')
+    .optional()
     .isEmail()
     .normalizeEmail()
     .withMessage('Please provide a valid email'),
   body('phone')
+    .optional()
     .isMobilePhone('any')
     .withMessage('Please provide a valid phone number'),
   body('password')
+    .optional()
     .isLength({ min: 6 })
     .withMessage('Password must be at least 6 characters')
 ];
 
 const loginValidation = [
   body('email')
+    .optional()
     .isEmail()
     .normalizeEmail()
     .withMessage('Please provide a valid email'),
+  body('phone')
+    .optional()
+    .isMobilePhone('any')
+    .withMessage('Please provide a valid phone number'),
   body('password')
     .notEmpty()
     .withMessage('Password is required')
