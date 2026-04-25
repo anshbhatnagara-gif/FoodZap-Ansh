@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Beverage List</title>
+    <style>
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .sub-list {
+            padding-left: 40px;
+        }
+    </style>
+</head>
+<body>
+
+<ul>
+    <li>Coffee</li>
+    <li>Tea</li>
+</ul>
+
+<ul class="sub-list">
+    <li>Black tea</li>
+    <li>Green tea</li>
+</ul>
+
+<ul>
+    <li>Milk</li>
+</ul>
+
+</body>
+</html>

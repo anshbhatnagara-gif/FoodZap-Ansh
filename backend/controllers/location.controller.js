@@ -261,19 +261,29 @@ exports.saveAddress = async (req, res, next) => {
       isDefault: false
     };
 
-    // If first address, make it default
-    const user = await User.findById(userId);
-    if (user.addresses.length === 0) {
+    // Check if this is the first address
+    const existingAddresses = await User.getAddresses(userId);
+    if (existingAddresses.length === 0) {
       newAddress.isDefault = true;
     }
 
-    user.addresses.push(newAddress);
-    await user.save();
+    // Add address using User model
+    const addedAddress = await User.addAddress(userId, {
+      label: newAddress.label,
+      street: address,
+      city,
+      state,
+      pincode,
+      landmark,
+      latitude: coordinates ? coordinates[1] : null,
+      longitude: coordinates ? coordinates[0] : null,
+      isDefault: newAddress.isDefault
+    });
 
     res.json({
       success: true,
       message: 'Address saved successfully',
-      data: user.addresses[user.addresses.length - 1]
+      data: addedAddress
     });
   } catch (error) {
     next(error);
@@ -289,21 +299,20 @@ exports.updateAddress = async (req, res, next) => {
     const updates = req.body;
     const userId = req.user.id;
 
-    // If setting as default, unset others
-    if (updates.isDefault) {
-      await User.updateOne(
-        { _id: userId },
-        { $set: { 'addresses.$[].isDefault': false } }
-      );
-    }
+    // Update address using User model
+    const updatedAddress = await User.updateAddress(addressId, userId, {
+      label: updates.label,
+      street: updates.address,
+      city: updates.city,
+      state: updates.state,
+      pincode: updates.pincode,
+      landmark: updates.landmark,
+      latitude: updates.coordinates ? updates.coordinates[1] : null,
+      longitude: updates.coordinates ? updates.coordinates[0] : null,
+      isDefault: updates.isDefault
+    });
 
-    const user = await User.findOneAndUpdate(
-      { _id: userId, 'addresses._id': addressId },
-      { $set: { 'addresses.$': { ...updates, _id: addressId } } },
-      { new: true }
-    );
-
-    if (!user) {
+    if (!updatedAddress) {
       return res.status(404).json({
         success: false,
         message: 'Address not found'
@@ -313,7 +322,7 @@ exports.updateAddress = async (req, res, next) => {
     res.json({
       success: true,
       message: 'Address updated successfully',
-      data: user.addresses.id(addressId)
+      data: updatedAddress
     });
   } catch (error) {
     next(error);
@@ -328,24 +337,15 @@ exports.deleteAddress = async (req, res, next) => {
     const { addressId } = req.params;
     const userId = req.user.id;
 
-    const user = await User.findById(userId);
-    const address = user.addresses.id(addressId);
+    // Delete address using User model
+    const result = await User.deleteAddress(addressId, userId);
 
-    if (!address) {
+    if (!result || !result.deleted) {
       return res.status(404).json({
         success: false,
         message: 'Address not found'
       });
     }
-
-    // If deleting default, set another as default
-    if (address.isDefault && user.addresses.length > 1) {
-      const otherAddress = user.addresses.find(a => a._id.toString() !== addressId);
-      if (otherAddress) otherAddress.isDefault = true;
-    }
-
-    user.addresses.pull(addressId);
-    await user.save();
 
     res.json({
       success: true,

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,12 +16,14 @@
             margin: 0;
             background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
         }
+
         .loading {
             text-align: center;
             color: white;
         }
+
         .spinner {
-            border: 4px solid rgba(255,255,255,0.3);
+            border: 4px solid rgba(255, 255, 255, 0.3);
             border-top: 4px solid white;
             border-radius: 50%;
             width: 50px;
@@ -28,27 +31,36 @@
             animation: spin 1s linear infinite;
             margin: 0 auto 20px;
         }
+
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
+
         a {
             color: white;
             text-decoration: underline;
         }
     </style>
 </head>
+
 <body>
     <div class="loading">
         <nav class="nav-links" id="navLinks">
-        <a href="./pages/restaurants.html">Restaurants</a>
-        <a href="./pages/instamart.html">Instamart</a>
-        <a href="./pages/offers.html">Offers</a>
-        <a href="./pages/chat.html" style="color: var(--primary);"><i class="fas fa-headset"></i> Support</a>
-      </nav>
+            <a href="./pages/restaurants.html">Restaurants</a>
+            <a href="./pages/instamart.html">Instamart</a>
+            <a href="./pages/offers.html">Offers</a>
+            <a href="./pages/chat.html" style="color: var(--primary);"><i class="fas fa-headset"></i> Support</a>
+        </nav>
         <div class="spinner"></div>
         <h1>🍕 FoodZap</h1>
         <p>Loading... <a href="pages/index.html">Click here if not redirected</a></p>
     </div>
 </body>
+
 </html>

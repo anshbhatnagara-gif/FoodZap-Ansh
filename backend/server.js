@@ -29,6 +29,7 @@ const deliveryRoutes = require('./routes/delivery.routes');
 const groceryRoutes = require('./routes/grocery.routes');
 const notificationRoutes = require('./routes/notification.routes');
 const walletRoutes = require('./routes/wallet.routes');
+const loyaltyRoutes = require('./routes/loyalty.routes');
 
 // Import middleware
 const errorHandler = require('./middleware/error.middleware');
@@ -155,6 +156,7 @@ app.use('/api/delivery', deliveryRoutes);
 app.use('/api/grocery', groceryRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/wallet', walletRoutes);
+app.use('/api/loyalty', loyaltyRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

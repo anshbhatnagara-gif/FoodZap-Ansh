@@ -1,11 +1,13 @@
 /**
  * Payment Controller
  * Handles payment processing with Razorpay
+ * MySQL Compatible Version
  */
 
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const Order = require('../models/order.model');
+const { db } = require('../config/database');
 
 // Initialize Razorpay
 const razorpay = new Razorpay({
@@ -21,16 +23,16 @@ exports.createPaymentOrder = async (req, res, next) => {
     const { orderId } = req.body;
     const userId = req.user.id;
 
-    const order = await Order.findOne({ _id: orderId, user: userId });
+    const order = await Order.findById(orderId);
 
-    if (!order) {
+    if (!order || order.userId != userId) {
       return res.status(404).json({
         success: false,
         message: 'Order not found'
       });
     }
 
-    if (order.payment.status === 'completed') {
+    if (order.paymentStatus === 'completed') {
       return res.status(400).json({
         success: false,
         message: 'Payment already completed'
@@ -39,11 +41,11 @@ exports.createPaymentOrder = async (req, res, next) => {
 
     // Create Razorpay order
     const options = {
-      amount: Math.round(order.pricing.totalAmount * 100), // Convert to paise
+      amount: Math.round(order.finalAmount * 100), // Convert to paise
       currency: 'INR',
-      receipt: order.orderId,
+      receipt: order.orderNumber,
       notes: {
-        orderId: order._id.toString(),
+        orderId: order.id.toString(),
         userId: userId.toString()
       }
     };
@@ -92,20 +94,17 @@ exports.verifyPayment = async (req, res, next) => {
       });
     }
 
-    // Update order payment status
-    const order = await Order.findByIdAndUpdate(
-      orderId,
-      {
-        'payment.status': 'completed',
-        'payment.transactionId': razorpay_payment_id,
-        'payment.paidAt': new Date()
-      },
-      { new: true }
+    // Update order payment status using SQL
+    await db.query(
+      `UPDATE orders SET paymentStatus = 'completed', paymentId = ?, paidAt = NOW() WHERE id = ?`,
+      [razorpay_payment_id, orderId]
     );
+    
+    const updatedOrder = await Order.findById(orderId);
 
     // Emit payment confirmation
-    req.io.to(`order-${order._id}`).emit('payment-completed', {
-      orderId: order.orderId,
+    req.io.to(`order-${orderId}`).emit('payment-completed', {
+      orderId: updatedOrder.orderNumber,
       transactionId: razorpay_payment_id
     });
 
@@ -113,7 +112,7 @@ exports.verifyPayment = async (req, res, next) => {
       success: true,
       message: 'Payment verified successfully',
       data: {
-        orderId: order.orderId,
+        orderId: updatedOrder.orderNumber,
         paymentId: razorpay_payment_id,
         status: 'completed'
       }
@@ -131,12 +130,9 @@ exports.paymentFailed = async (req, res, next) => {
     const { orderId, error } = req.body;
     const userId = req.user.id;
 
-    await Order.findOneAndUpdate(
-      { _id: orderId, user: userId },
-      {
-        'payment.status': 'failed',
-        'payment.error': error
-      }
+    await db.query(
+      `UPDATE orders SET paymentStatus = 'failed', paymentError = ? WHERE id = ? AND userId = ?`,
+      [error, orderId, userId]
     );
 
     res.json({
@@ -156,12 +152,9 @@ exports.getPaymentDetails = async (req, res, next) => {
     const { orderId } = req.params;
     const userId = req.user.id;
 
-    const order = await Order.findOne(
-      { _id: orderId, user: userId },
-      'orderId pricing.payment payment'
-    );
+    const order = await Order.findById(orderId);
 
-    if (!order) {
+    if (!order || order.userId != userId) {
       return res.status(404).json({
         success: false,
         message: 'Order not found'
@@ -170,7 +163,11 @@ exports.getPaymentDetails = async (req, res, next) => {
 
     res.json({
       success: true,
-      data: order.payment
+      data: {
+        status: order.paymentStatus,
+        transactionId: order.paymentId,
+        paidAt: order.paidAt
+      }
     });
   } catch (error) {
     next(error);
@@ -186,27 +183,26 @@ exports.processRefund = async (req, res, next) => {
 
     const order = await Order.findById(orderId);
 
-    if (!order || order.payment.status !== 'completed') {
+    if (!order || order.paymentStatus !== 'completed') {
       return res.status(400).json({
         success: false,
         message: 'Order not found or payment not completed'
       });
     }
 
-    const refundAmount = amount || order.pricing.totalAmount;
+    const refundAmount = amount || order.finalAmount;
 
     // Create refund in Razorpay
-    const refund = await razorpay.payments.refund(order.payment.transactionId, {
+    const refund = await razorpay.payments.refund(order.paymentId, {
       amount: Math.round(refundAmount * 100),
       notes: { reason }
     });
 
-    // Update order
-    order.payment.status = 'refunded';
-    order.payment.refundAmount = refundAmount;
-    order.payment.refundReason = reason;
-    order.cancellation.refundStatus = 'completed';
-    await order.save();
+    // Update order using SQL
+    await db.query(
+      `UPDATE orders SET paymentStatus = 'refunded', refundAmount = ?, refundReason = ?, refundStatus = 'completed' WHERE id = ?`,
+      [refundAmount, reason, orderId]
+    );
 
     res.json({
       success: true,

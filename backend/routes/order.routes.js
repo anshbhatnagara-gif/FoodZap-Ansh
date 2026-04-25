@@ -15,6 +15,7 @@ router.get('/', orderController.getOrders);
 router.get('/track/:id', orderController.trackOrder);
 router.get('/:id', orderController.getOrder);
 router.put('/:id/cancel', orderController.cancelOrder);
+router.put('/:id/status', orderController.updateOrderStatus);
 router.post('/:id/rate', orderController.rateOrder);
 router.post('/:id/reorder', orderController.reorder);
 

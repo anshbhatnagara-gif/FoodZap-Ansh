@@ -1,14 +1,15 @@
 /**
  * Order Controller
  * Handles order creation, tracking, and management
+ * MySQL Compatible Version
  */
 
 const Order = require('../models/order.model');
 const Cart = require('../models/cart.model');
-const User = require('../models/user.model');
 const Restaurant = require('../models/restaurant.model');
 const MenuItem = require('../models/menu.model');
 const Wallet = require('../models/wallet.model');
+const { db } = require('../config/database');
 const notificationService = require('../services/notification.service');
 
 /**
@@ -205,8 +206,8 @@ exports.createOrder = async (req, res, next) => {
       success: true,
       message: 'Order placed successfully',
       data: {
-        orderId: order.orderId,
-        id: order._id,
+        orderId: order.orderNumber,
+        id: order.id,
         status: order.status,
         totalAmount,
         estimatedDeliveryTime: order.estimatedDeliveryTime
@@ -225,26 +226,51 @@ exports.getOrders = async (req, res, next) => {
     const { status, page = 1, limit = 10 } = req.query;
     const userId = req.user.id;
 
-    const query = { user: userId };
+    // Build query with filters
+    let sql = `SELECT o.*, 
+      r.name as restaurantName, r.images as restaurantImages, r.address as restaurantAddress, r.phone as restaurantPhone,
+      u.name as deliveryPartnerName, u.phone as deliveryPartnerPhone
+      FROM orders o
+      LEFT JOIN restaurants r ON o.restaurantId = r.id
+      LEFT JOIN users u ON o.deliveryPartnerId = u.id
+      WHERE o.userId = ?`;
+    const params = [userId];
+    
     if (status) {
-      query.status = status;
+      sql += ` AND o.status = ?`;
+      params.push(status);
     }
-
-    const orders = await Order.find(query)
-      .populate('restaurant', 'name images address phone')
-      .populate('deliveryPartner', 'name phone')
-      .populate('items.menuItem', 'name images')
-      .sort({ createdAt: -1 })
-      .skip((parseInt(page) - 1) * parseInt(limit))
-      .limit(parseInt(limit));
-
-    const total = await Order.countDocuments(query);
+    
+    // Get total count
+    let countSql = `SELECT COUNT(*) as count FROM orders WHERE userId = ?`;
+    const countParams = [userId];
+    if (status) {
+      countSql += ` AND status = ?`;
+      countParams.push(status);
+    }
+    const countResult = await db.query(countSql, countParams);
+    const total = countResult[0].count;
+    
+    // Add pagination
+    sql += ` ORDER BY o.createdAt DESC LIMIT ? OFFSET ?`;
+    params.push(parseInt(limit), (parseInt(page) - 1) * parseInt(limit));
+    
+    const orders = await db.query(sql, params);
+    
+    // Parse JSON fields
+    const parsedOrders = orders.map(order => ({
+      ...order,
+      items: typeof order.items === 'string' ? JSON.parse(order.items) : (order.items || []),
+      deliveryAddress: typeof order.deliveryAddress === 'string' ? JSON.parse(order.deliveryAddress) : (order.deliveryAddress || {}),
+      restaurantImages: typeof order.restaurantImages === 'string' ? JSON.parse(order.restaurantImages) : (order.restaurantImages || {}),
+      restaurantAddress: typeof order.restaurantAddress === 'string' ? JSON.parse(order.restaurantAddress) : (order.restaurantAddress || {})
+    }));
 
     res.json({
       success: true,
-      count: orders.length,
+      count: parsedOrders.length,
       total,
-      data: orders
+      data: parsedOrders
     });
   } catch (error) {
     next(error);
@@ -259,18 +285,33 @@ exports.getOrder = async (req, res, next) => {
     const { id } = req.params;
     const userId = req.user.id;
 
-    const order = await Order.findOne({ _id: id, user: userId })
-      .populate('restaurant', 'name images address phone')
-      .populate('deliveryPartner', 'name phone avatar rating')
-      .populate('items.menuItem', 'name images')
-      .populate('user', 'name phone');
-
-    if (!order) {
+    // Get order with related data using SQL joins
+    const sql = `SELECT o.*,
+      r.name as restaurantName, r.images as restaurantImages, r.address as restaurantAddress, r.phone as restaurantPhone,
+      dp.name as deliveryPartnerName, dp.phone as deliveryPartnerPhone, dp.avatar as deliveryPartnerAvatar,
+      u.name as userName, u.phone as userPhone
+      FROM orders o
+      LEFT JOIN restaurants r ON o.restaurantId = r.id
+      LEFT JOIN users dp ON o.deliveryPartnerId = dp.id
+      LEFT JOIN users u ON o.userId = u.id
+      WHERE o.id = ? AND o.userId = ?`;
+    
+    const orders = await db.query(sql, [id, userId]);
+    
+    if (!orders || orders.length === 0) {
       return res.status(404).json({
         success: false,
         message: 'Order not found'
       });
     }
+    
+    const order = orders[0];
+    
+    // Parse JSON fields
+    order.items = typeof order.items === 'string' ? JSON.parse(order.items) : (order.items || []);
+    order.deliveryAddress = typeof order.deliveryAddress === 'string' ? JSON.parse(order.deliveryAddress) : (order.deliveryAddress || {});
+    order.restaurantImages = typeof order.restaurantImages === 'string' ? JSON.parse(order.restaurantImages) : (order.restaurantImages || {});
+    order.restaurantAddress = typeof order.restaurantAddress === 'string' ? JSON.parse(order.restaurantAddress) : (order.restaurantAddress || {});
 
     res.json({
       success: true,
@@ -288,32 +329,49 @@ exports.trackOrder = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const order = await Order.findOne({ orderId: id })
-      .populate('restaurant', 'name address location')
-      .populate('deliveryPartner', 'name phone currentLocation')
-      .select('orderId status deliveryPartner deliveryAddress deliveryTracking estimatedDeliveryTime statusHistory');
+    // Get order with related data using SQL joins
+    const sql = `SELECT o.id, o.orderNumber, o.status, o.deliveryAddress, o.estimatedDeliveryTime,
+      o.deliveryPartnerId, o.restaurantId,
+      r.name as restaurantName, r.address as restaurantAddress,
+      dp.name as deliveryPartnerName, dp.phone as deliveryPartnerPhone
+      FROM orders o
+      LEFT JOIN restaurants r ON o.restaurantId = r.id
+      LEFT JOIN users dp ON o.deliveryPartnerId = dp.id
+      WHERE o.orderNumber = ?`;
+    
+    const orders = await db.query(sql, [id]);
 
-    if (!order) {
+    if (!orders || orders.length === 0) {
       return res.status(404).json({
         success: false,
         message: 'Order not found'
       });
     }
-
-    // Get latest tracking info
-    const latestTracking = order.deliveryTracking[order.deliveryTracking.length - 1];
+    
+    const order = orders[0];
+    order.deliveryAddress = typeof order.deliveryAddress === 'string' ? JSON.parse(order.deliveryAddress) : (order.deliveryAddress || {});
+    order.restaurantAddress = typeof order.restaurantAddress === 'string' ? JSON.parse(order.restaurantAddress) : (order.restaurantAddress || {});
+    
+    // Get status history
+    const statusHistory = await Order.getStatusHistory(order.id);
 
     res.json({
       success: true,
       data: {
-        orderId: order.orderId,
+        orderId: order.orderNumber,
         status: order.status,
-        restaurant: order.restaurant,
-        deliveryPartner: order.deliveryPartner,
+        restaurant: {
+          name: order.restaurantName,
+          address: order.restaurantAddress
+        },
+        deliveryPartner: order.deliveryPartnerId ? {
+          name: order.deliveryPartnerName,
+          phone: order.deliveryPartnerPhone
+        } : null,
         deliveryAddress: order.deliveryAddress,
-        currentLocation: latestTracking || null,
+        currentLocation: null, // Would need separate tracking table
         estimatedDeliveryTime: order.estimatedDeliveryTime,
-        statusHistory: order.statusHistory,
+        statusHistory: statusHistory,
         progress: getOrderProgress(order.status)
       }
     });
@@ -331,9 +389,10 @@ exports.cancelOrder = async (req, res, next) => {
     const { reason } = req.body;
     const userId = req.user.id;
 
-    const order = await Order.findOne({ _id: id, user: userId });
+    // Get order
+    const order = await Order.findById(id);
 
-    if (!order) {
+    if (!order || order.userId != userId) {
       return res.status(404).json({
         success: false,
         message: 'Order not found'
@@ -348,26 +407,25 @@ exports.cancelOrder = async (req, res, next) => {
       });
     }
 
-    order.status = 'cancelled';
-    order.cancelledAt = new Date();
-    order.cancellation = {
-      reason,
-      cancelledBy: 'user',
-      refundStatus: order.payment.status === 'completed' ? 'pending' : 'not_applicable'
-    };
-
-    await order.save();
+    // Update order status using MySQL model
+    await Order.updateStatus(id, 'cancelled', `Cancelled by user: ${reason}`);
+    
+    // Update additional cancellation fields
+    await db.query(
+      `UPDATE orders SET cancelledAt = NOW(), cancellationReason = ?, cancelledBy = 'user', refundStatus = ? WHERE id = ?`,
+      [reason, order.paymentStatus === 'completed' ? 'pending' : 'not_applicable', id]
+    );
 
     // Emit cancellation event
-    req.io.to(`order-${order._id}`).emit('order-cancelled', {
-      orderId: order.orderId,
+    req.io.to(`order-${id}`).emit('order-cancelled', {
+      orderId: order.orderNumber,
       reason
     });
 
     res.json({
       success: true,
       message: 'Order cancelled successfully',
-      data: { orderId: order.orderId, status: order.status }
+      data: { orderId: order.orderNumber, status: 'cancelled' }
     });
   } catch (error) {
     next(error);
@@ -383,42 +441,39 @@ exports.rateOrder = async (req, res, next) => {
     const { foodRating, deliveryRating, comment } = req.body;
     const userId = req.user.id;
 
-    const order = await Order.findOne({ _id: id, user: userId, status: 'delivered' });
+    // Get order
+    const order = await Order.findById(id);
 
-    if (!order) {
+    if (!order || order.userId != userId || order.status !== 'delivered') {
       return res.status(404).json({
         success: false,
         message: 'Order not found or not delivered'
       });
     }
 
-    if (order.rating && order.rating.food) {
+    // Check if already rated
+    if (order.foodRating) {
       return res.status(400).json({
         success: false,
         message: 'Order already rated'
       });
     }
 
-    order.rating = {
-      food: foodRating,
-      delivery: deliveryRating,
-      comment,
-      ratedAt: new Date()
-    };
-
-    await order.save();
+    // Update order with rating using SQL
+    await db.query(
+      `UPDATE orders SET foodRating = ?, deliveryRating = ?, ratingComment = ?, ratedAt = NOW() WHERE id = ?`,
+      [foodRating, deliveryRating, comment, id]
+    );
 
     // Update restaurant rating
-    await updateRestaurantRating(order.restaurant);
+    await updateRestaurantRating(order.restaurantId);
 
     // Update delivery partner rating if applicable
-    if (order.deliveryPartner && deliveryRating) {
-      await User.findByIdAndUpdate(order.deliveryPartner, {
-        $inc: {
-          'deliveryPartner.rating.count': 1,
-          'deliveryPartner.rating.average': deliveryRating
-        }
-      });
+    if (order.deliveryPartnerId && deliveryRating) {
+      await db.query(
+        `UPDATE users SET ratingCount = ratingCount + 1, ratingSum = ratingSum + ? WHERE id = ?`,
+        [deliveryRating, order.deliveryPartnerId]
+      );
     }
 
     res.json({
@@ -438,9 +493,83 @@ exports.reorder = async (req, res, next) => {
     const { id } = req.params;
     const userId = req.user.id;
 
-    const order = await Order.findOne({ _id: id, user: userId })
-      .populate('items.menuItem');
+    // Get order
+    const order = await Order.findById(id);
 
+    if (!order || order.userId != userId) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found'
+      });
+    }
+
+    // Parse items
+    const items = typeof order.items === 'string' ? JSON.parse(order.items) : (order.items || []);
+    
+    // Get or create cart
+    let cart = await Cart.getOrCreate(userId);
+    
+    // Clear existing items if from different restaurant
+    if (cart.restaurantId && cart.restaurantId != order.restaurantId) {
+      await Cart.clear(userId);
+      cart = await Cart.getOrCreate(userId);
+    }
+
+    let addedCount = 0;
+    for (const item of items) {
+      // Check if item is still available
+      const menuItem = await MenuItem.findById(item.menuItemId);
+      if (menuItem && menuItem.isAvailable) {
+        await Cart.addItem(userId, {
+          menuItemId: item.menuItemId,
+          restaurantId: order.restaurantId,
+          name: menuItem.name,
+          price: menuItem.price,
+          quantity: item.quantity,
+          variant: item.variant,
+          addons: item.addons,
+          specialInstructions: item.specialInstructions
+        });
+        addedCount++;
+      }
+    }
+
+    const updatedCart = await Cart.getCartSummary(userId);
+
+    res.json({
+      success: true,
+      message: 'Items added to cart',
+      data: {
+        itemCount: addedCount,
+        cart: updatedCart
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Update order status (for restaurant/delivery partners)
+ */
+exports.updateOrderStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { status, notes } = req.body;
+    const userId = req.user.id;
+    const userRole = req.user.role;
+
+    // Valid status transitions
+    const validStatuses = ['pending', 'confirmed', 'preparing', 'out_for_delivery', 'delivered', 'cancelled'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid status'
+      });
+    }
+
+    // Get order
+    const order = await Order.findById(id);
     if (!order) {
       return res.status(404).json({
         success: false,
@@ -448,40 +577,44 @@ exports.reorder = async (req, res, next) => {
       });
     }
 
-    // Add items to cart
-    const cart = await Cart.findOne({ user: userId }) || new Cart({ user: userId, items: [] });
-    
-    // Clear existing items if from different restaurant
-    if (cart.activeRestaurant && cart.activeRestaurant.toString() !== order.restaurant.toString()) {
-      cart.items = [];
+    // Check permission based on role
+    if (userRole === 'restaurant' && order.restaurantId != userId) {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to update this order'
+      });
     }
 
-    cart.activeRestaurant = order.restaurant;
+    // Update status
+    await Order.updateStatus(id, status, notes || `Status updated to ${status}`);
 
-    for (const item of order.items) {
-      // Check if item is still available
-      const menuItem = await MenuItem.findById(item.menuItem._id);
-      if (menuItem && menuItem.isAvailable) {
-        cart.items.push({
-          menuItem: item.menuItem._id,
-          restaurant: order.restaurant,
-          quantity: item.quantity,
-          variant: item.variant,
-          addons: item.addons,
-          specialInstructions: item.specialInstructions
-        });
-      }
+    // Award loyalty points when order is delivered
+    if (status === 'delivered') {
+      const loyaltyController = require('./loyalty.controller');
+      await loyaltyController.awardPointsForOrder(
+        order.userId,
+        order.id,
+        order.finalAmount
+      );
+      
+      // Emit delivery completion
+      req.io.to(`order-${id}`).emit('order-delivered', {
+        orderId: order.orderNumber,
+        message: 'Your order has been delivered!'
+      });
     }
 
-    await cart.save();
+    // Emit status update
+    req.io.to(`order-${id}`).emit('status-change', {
+      orderId: order.orderNumber,
+      status,
+      timestamp: new Date()
+    });
 
     res.json({
       success: true,
-      message: 'Items added to cart',
-      data: {
-        itemCount: cart.items.length,
-        cartId: cart._id
-      }
+      message: 'Order status updated',
+      data: { orderId: order.orderNumber, status }
     });
   } catch (error) {
     next(error);
@@ -504,22 +637,22 @@ function getOrderProgress(status) {
 }
 
 async function updateRestaurantRating(restaurantId) {
-  const Review = require('../models/review.model');
-  const stats = await Review.aggregate([
-    { $match: { restaurant: restaurantId, isActive: true } },
-    {
-      $group: {
-        _id: null,
-        avgRating: { $avg: '$rating.overall' },
-        totalReviews: { $sum: 1 }
-      }
-    }
-  ]);
+  try {
+    // Get review stats using SQL
+    const stats = await db.query(
+      `SELECT AVG(overallRating) as avgRating, COUNT(*) as totalReviews 
+       FROM reviews WHERE restaurantId = ? AND isActive = true`,
+      [restaurantId]
+    );
 
-  if (stats.length > 0) {
-    await Restaurant.findByIdAndUpdate(restaurantId, {
-      'rating.average': Math.round(stats[0].avgRating * 10) / 10,
-      'rating.count': stats[0].totalReviews
-    });
+    if (stats.length > 0 && stats[0].totalReviews > 0) {
+      const avgRating = Math.round(stats[0].avgRating * 10) / 10;
+      await db.query(
+        `UPDATE restaurants SET rating = ?, ratingCount = ? WHERE id = ?`,
+        [avgRating, stats[0].totalReviews, restaurantId]
+      );
+    }
+  } catch (error) {
+    console.error('Error updating restaurant rating:', error);
   }
 }

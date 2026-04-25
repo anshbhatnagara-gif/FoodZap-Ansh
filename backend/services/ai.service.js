@@ -1,4 +1,4 @@
-......3/**
+/**
  * AI Service
  * Integrates with Google Gemini API for food suggestions and chat
  */

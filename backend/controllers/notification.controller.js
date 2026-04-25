@@ -94,10 +94,12 @@ exports.deleteNotification = async (req, res, next) => {
     const userId = req.user.id;
     const { notificationId } = req.params;
 
-    const User = require('../models/user.model');
-    await User.findByIdAndUpdate(userId, {
-      $pull: { notifications: { _id: notificationId } }
-    });
+    const { db } = require('../config/database');
+    // Delete notification from separate notifications table
+    await db.query(
+      `DELETE FROM notifications WHERE id = ? AND userId = ?`,
+      [notificationId, userId]
+    );
 
     res.json({
       success: true,

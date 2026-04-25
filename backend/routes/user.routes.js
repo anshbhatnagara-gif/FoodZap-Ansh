@@ -114,7 +114,7 @@ router.delete('/favorites', async (req, res) => {
   }
 });
 
-// Upload avatar (Cloudinary)
+-// Upload avatar (Cloudinary)
 router.post('/upload-avatar', upload.profile, async (req, res) => {
   try {
     if (!req.file) {
